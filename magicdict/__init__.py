@@ -20,10 +20,12 @@ from typing import Mapping, MutableMapping, TypeVar, KeysView, ValuesView, \
     ItemsView, Generic, Iterator, Iterable, Tuple, Any, Optional, List, Set, \
     Union
 
+from ._version import version, __version__
+
 import typing
 import functools
 
-__all__ = ["FrozenMagicDict", "MagicDict"]
+__all__ = ["version", "__version__", "FrozenMagicDict", "MagicDict"]
 
 _K = TypeVar("_K")
 
