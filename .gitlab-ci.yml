@@ -14,7 +14,7 @@ mypy-3-6-linux:
     - mypy --fast-parser --python-version 3.6 --disallow-untyped-calls --disallow-untyped-defs --warn-unused-ignores --show-traceback --strict-optional --ignore-missing-imports --follow-imports=skip --show-error-context --show-traceback -p magicdict
 
 pycodestyle-3-6-linux:
-  image: python:3.6,0
+  image: python:3.6.0
   stage: pycodestyle
   before_script:
     - pip install -U setuptools pip
