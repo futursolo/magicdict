@@ -65,6 +65,9 @@ class _TotalOrdering(abc.ABC, Iterable[Any]):
 
 
 class _MagicKeysView(KeysView[_K], Generic[_K], _TotalOrdering):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        _TotalOrdering.__init__(self, *args, **kwargs)
+
     def __len__(self) -> int:
         return len(self._map)
 
@@ -128,6 +131,9 @@ class _MagicValuesView(ValuesView[_V], Generic[_V]):
 
 
 class _MagicItemsView(ItemsView[_K, _V], Generic[_K, _V], _TotalOrdering):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        _TotalOrdering.__init__(self, *args, **kwargs)
+
     def __len__(self) -> int:
         return len(self._map)
 

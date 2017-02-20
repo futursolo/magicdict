@@ -1,8 +1,9 @@
 stages:
   - mypy
   - pycodestyle
+  - unittest
 
-mypy-3-6-linux:
+mypy-3-6-0-linux:
   image: python:3.6.0
   stage: mypy
   before_script:
@@ -13,7 +14,7 @@ mypy-3-6-linux:
   script:
     - mypy --fast-parser --python-version 3.6 --disallow-untyped-calls --disallow-untyped-defs --warn-unused-ignores --show-traceback --strict-optional --ignore-missing-imports --follow-imports=skip --show-error-context --show-traceback -p magicdict
 
-pycodestyle-3-6-linux:
+pycodestyle-3-6-0-linux:
   image: python:3.6.0
   stage: pycodestyle
   before_script:
@@ -23,3 +24,16 @@ pycodestyle-3-6-linux:
     - pip install -U pycodestyle
   script:
     - pycodestyle --show-source magicdict
+
+unittest-3-6-0-linux:
+  image: python:3.6.0
+  stage: unittest
+  before_script:
+    - pip install -U setuptools pip
+    - pip install . -U
+
+    - pip install -U codecov coverage
+  script:
+    - python -m coverage run --source=magicdict setup.py test
+  after_script:
+    - codecov --token=$CODECOV_TOKEN

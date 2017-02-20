@@ -47,6 +47,9 @@ if __name__ == "__main__":
         setup_requires=setup_requires,
         install_requires=install_requires,
         tests_require=tests_require,
+        extras_require={
+            "test": tests_require
+        },
         zip_safe=False,
         classifiers=[
             "Operating System :: MacOS",
