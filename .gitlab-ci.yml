@@ -30,7 +30,7 @@ unittest-3-6-0-linux:
   stage: unittest
   before_script:
     - pip install -U setuptools pip
-    - pip install . -U
+    - pip install ".[test]" -U
 
     - pip install -U codecov coverage
   script:

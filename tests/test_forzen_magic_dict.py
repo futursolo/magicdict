@@ -20,7 +20,13 @@ from magicdict import FrozenMagicDict
 
 class FrozenMagicDictTestCase:
     def test_init_with_iter(self):
-        sample = [("a", "b"), ("c", "d"), ("e", "f")]
-        dic = FrozenMagicDict([("a", "b"), ("c", "d"), ("e", "f")])
+        sample = [("a", "b"), ("c", "d"), ("c", "d"), ("e", "f")]
+        dic = FrozenMagicDict(sample)
 
         assert sample == [(k, v) for k, v in dic.items()]
+
+    def test_init_with_mapping(self):
+        sample = {"a": "b", "c": "d", "e": "f"}
+        dic = FrozenMagicDict(sample)
+
+        assert sample.items() == dic.items()

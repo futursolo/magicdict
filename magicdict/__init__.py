@@ -179,7 +179,7 @@ class FrozenMagicDict(Mapping[_K, _V], Generic[_K, _V]):
             self._kv_pairs[identifier] = (key, value)
 
         if len(args):
-            if len(args) > 1:
+            if len(args) > 1:  # pragma: no cover
                 raise TypeError(
                     ("update expected at most 1 positional argument, "
                      "got {} args.").format(len(args)))
@@ -193,7 +193,7 @@ class FrozenMagicDict(Mapping[_K, _V], Generic[_K, _V]):
                     for k, v in args[0]:
                         add_one(k, v)
 
-                else:
+                else:  # pragma: no cover
                     raise TypeError(
                         ("update expected a Mapping or an Iterable "
                          "as the positional argument, got {}.")
