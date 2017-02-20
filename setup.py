@@ -26,9 +26,11 @@ def load_version(module_name):
     return _version.version
 
 
-setup_requires = ["setuptools"]
+setup_requires = ["setuptools", "pytest-runner>=2.11.1,<3"]
 
 install_requires = []
+
+tests_require = ["pytest>=3.0.6,<4"]
 
 if __name__ == "__main__":
     setup(
@@ -44,6 +46,7 @@ if __name__ == "__main__":
         include_package_data=True,
         setup_requires=setup_requires,
         install_requires=install_requires,
+        tests_require=tests_require,
         zip_safe=False,
         classifiers=[
             "Operating System :: MacOS",
