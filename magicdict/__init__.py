@@ -18,7 +18,7 @@
 
 from typing import Mapping, MutableMapping, TypeVar, KeysView, ValuesView, \
     ItemsView, Generic, Iterator, Iterable, Tuple, Any, Optional, List, Set, \
-    Union, Dict, MappingView
+    Union, Dict, MappingView, Reversible
 
 from ._version import version, __version__
 
@@ -131,7 +131,8 @@ class _MagicValuesView(ValuesView[_V], Generic[_V]):
         return reversed(self._map).values()  # type: ignore
 
 
-class _MagicItemsView(ItemsView[_K, _V], Generic[_K, _V]):
+class _MagicItemsView(
+        Reversible[Tuple[_K, _V]], ItemsView[_K, _V], Generic[_K, _V]):
     def __init__(self, map: Union["FrozenMagicDict", "MagicDict"]) -> None:
         self._map = map
 
@@ -180,11 +181,11 @@ class _MagicItemsView(ItemsView[_K, _V], Generic[_K, _V]):
     def __xor__(self, obj: Iterable[Any]) -> Set[Any]:
         return set(self) ^ set(obj)
 
-    def __reversed__(self) -> ItemsView[_K, _V]:
+    def __reversed__(self) -> Iterator[Tuple[_K, _V]]:
         return reversed(self._map).items()  # type: ignore
 
 
-class FrozenMagicDict(Mapping[_K, _V], Generic[_K, _V]):
+class FrozenMagicDict(Reversible[_K], Mapping[_K, _V], Generic[_K, _V]):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         self._pair_ids: Dict[_K, List[_Identifier]] = {}
         self._kv_pairs: \
@@ -257,8 +258,8 @@ class FrozenMagicDict(Mapping[_K, _V], Generic[_K, _V]):
             self.__class__.__name__,
             repr([(key, value) for (key, value) in self.items()]))
 
-    def __reversed__(self) -> "FrozenMagicDict[_K, _V]":
-        return self.__class__(reversed(list(self._kv_pairs.values())))
+    def __reversed__(self) -> Iterator[_K]:
+        return self.__class__(reversed(list(self.items())))
 
     def get_first(self, key: _K, default: Optional[_V]=None) -> Optional[_V]:
         if key not in self.keys():
@@ -286,13 +287,13 @@ class FrozenMagicDict(Mapping[_K, _V], Generic[_K, _V]):
     def copy(self) -> "FrozenMagicDict[_K, _V]":
         return self.__class__(self)
 
-    def keys(self) -> KeysView[_K]:
+    def keys(self) -> _MagicKeysView[_K]:
         return _MagicKeysView(self)
 
-    def values(self) -> ValuesView[_V]:
+    def values(self) -> _MagicValuesView[_V]:
         return _MagicValuesView(self)
 
-    def items(self) -> ItemsView[_K, _V]:
+    def items(self) -> _MagicItemsView[_K, _V]:
         return _MagicItemsView(self)
 
     get = get_first
@@ -332,10 +333,6 @@ class MagicDict(
             ids = self._pair_ids.pop(key)
             for identifier in ids:
                 del self._kv_pairs[identifier]
-
-    def __reversed__(self) -> "MagicDict[_K, _V]":
-        with self._lock:
-            return self.__class__(reversed(list(self._kv_pairs.values())))
 
     def get_last(self, key: _K, default: Optional[_V]=None) -> Optional[_V]:
         if key not in self.keys():
