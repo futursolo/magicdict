@@ -50,7 +50,7 @@ class _MagicKeysView(KeysView[_K], Generic[_K]):
         return len(self._map)
 
     def __iter__(self) -> Iterator[_K]:
-        for key, _ in self._map._kv_pairs.values():
+        for key, _ in list(self._map._kv_pairs.values()):
             yield key
 
     def __contains__(self, key: Any) -> bool:
@@ -103,13 +103,11 @@ class _MagicValuesView(ValuesView[_V], Generic[_V]):
         return len(self._map)
 
     def __iter__(self) -> Iterator[_V]:
-        pairs = self._map._kv_pairs.values()
-
-        for _, value in pairs:
+        for _, value in list(self._map._kv_pairs.values()):
             yield value
 
     def __contains__(self, value: Any) -> bool:
-        for _, _value in self._map._kv_pairs.values():
+        for _, _value in list(self._map._kv_pairs.values()):
             if _value == value:
                 return True
 
@@ -140,7 +138,7 @@ class _MagicItemsView(
         return len(self._map)
 
     def __iter__(self) -> Iterator[Tuple[_K, _V]]:
-        for key, value in self._map._kv_pairs.values():
+        for key, value in list(self._map._kv_pairs.values()):
             yield (key, value)
 
     def __contains__(self, pair: Any) -> bool:
