@@ -72,3 +72,14 @@ class FrozenMagicDictTestCase:
 
         assert dic != sample
         assert dic != dict(sample)
+
+    def test_method_str(self):
+        dic = FrozenMagicDict([("a", "b")])
+
+        assert str(dic) == "FrozenMagicDict([('a', 'b')])"
+
+    def test_method_reversed(self):
+        sample = [("a", "b"), ("c", "d"), ("c", "d"), ("e", "f")]
+        dic = FrozenMagicDict(sample)
+
+        assert reversed(dic) == reversed(sample)

@@ -64,7 +64,7 @@ class _MagicKeysView(KeysView[_K], Generic[_K]):
         else:
             return set(self) == set(obj)
 
-    def __ne__(self, obj) -> bool:
+    def __ne__(self, obj: Any) -> bool:
         return not self.__eq__(obj)
 
     def __lt__(self, obj: Any) -> bool:
@@ -153,7 +153,7 @@ class _MagicItemsView(ItemsView[_K, _V], Generic[_K, _V]):
         else:
             return set(self) == set(obj)
 
-    def __ne__(self, obj) -> bool:
+    def __ne__(self, obj: Any) -> bool:
         return not self.__eq__(obj)
 
     def __lt__(self, obj: Any) -> bool:
