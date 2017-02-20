@@ -45,6 +45,8 @@ class MagicKeysViewTestCase:
         assert dic.keys() == [k for k, _ in sample]
         assert dic.keys() == set([k for k, _ in sample])
 
+        assert dic.values() != []
+
     def test_method_reversed(self):
         sample = [("a", "b"), ("c", "d"), ("c", "d"), ("e", "f")]
         dic = FrozenMagicDict(sample)
@@ -86,7 +88,7 @@ class MagicKeysViewTestCase:
         sample2 = [("a", "b"), ("c", "d")]
         dic2 = FrozenMagicDict(sample2)
 
-        assert dic.keys() > dic2.keys()
+        assert dic.keys() >= dic2.keys()
 
     def test_method_and(self):
         sample = [("a", "b"), ("c", "d"), ("e", "f")]
@@ -152,6 +154,8 @@ class MagicValuesViewTestCase:
         assert dic.values() == [v for _, v in sample]
         assert dic.values() == set([v for _, v in sample])
 
+        assert dic.values() != []
+
     def test_method_reversed(self):
         sample = [("a", "b"), ("c", "d"), ("c", "d"), ("e", "f")]
         dic = FrozenMagicDict(sample)
@@ -186,6 +190,8 @@ class MagicItemsViewTestCase:
 
         assert dic.items() == sample
         assert dic.items() == set(sample)
+
+        assert dic.values() != []
 
     def test_method_reversed(self):
         sample = [("a", "b"), ("c", "d"), ("c", "d"), ("e", "f")]
@@ -227,7 +233,7 @@ class MagicItemsViewTestCase:
         sample2 = [("a", "b"), ("c", "d")]
         dic2 = FrozenMagicDict(sample2)
 
-        assert dic.items() > dic2.items()
+        assert dic.items() >= dic2.items()
 
     def test_method_and(self):
         sample = [("a", "b"), ("c", "d"), ("e", "f")]
