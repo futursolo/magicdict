@@ -45,7 +45,7 @@ class MagicKeysViewTestCase:
         assert dic.keys() == [k for k, _ in sample]
         assert dic.keys() == set([k for k, _ in sample])
 
-        assert dic.values() != []
+        assert dic.keys() != []
 
     def test_method_reversed(self):
         sample = [("a", "b"), ("c", "d"), ("c", "d"), ("e", "f")]
@@ -191,7 +191,7 @@ class MagicItemsViewTestCase:
         assert dic.items() == sample
         assert dic.items() == set(sample)
 
-        assert dic.values() != []
+        assert dic.items() != []
 
     def test_method_reversed(self):
         sample = [("a", "b"), ("c", "d"), ("c", "d"), ("e", "f")]
