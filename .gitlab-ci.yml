@@ -2,6 +2,7 @@ stages:
   - mypy
   - pycodestyle
   - unittest
+  - packaging
 
 mypy-3-6-0-linux:
   image: python:3.6.0
@@ -37,3 +38,16 @@ unittest-3-6-0-linux:
     - python -m coverage run --source=magicdict setup.py test
   after_script:
     - codecov --token=$CODECOV_TOKEN
+
+packaging-3-6-0-linux:
+  image: python:3.6.0
+  stage: packaging
+  before_script:
+    - pip install -U setuptools pip wheel
+    - pip install ".[test]" -U
+
+  script:
+    - python setup.py sdist bdist_wheel
+  artifacts:
+    paths:
+      - dist/

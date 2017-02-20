@@ -30,3 +30,9 @@ class FrozenMagicDictTestCase:
         dic = FrozenMagicDict(sample)
 
         assert sample.items() == dic.items()
+
+    def test_init_with_kwargs(self):
+        sample = {"a": "b", "c": "d", "e": "f"}
+        dic = FrozenMagicDict(**sample)
+
+        assert sample.items() == dic.items()
