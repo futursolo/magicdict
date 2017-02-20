@@ -455,6 +455,3 @@ class MagicDict(
 
         for key in keys:
             magic_dict.add(key, value)  # type: ignore
-
-    def copy(self) -> "MagicDict[_K, _V]":
-        return self.__class__(self)

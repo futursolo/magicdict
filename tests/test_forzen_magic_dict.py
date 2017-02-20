@@ -83,3 +83,30 @@ class FrozenMagicDictTestCase:
         dic = FrozenMagicDict(sample)
 
         assert reversed(dic) == reversed(sample)
+
+    def test_get_first(self):
+        dic = FrozenMagicDict([("a", "b"), ("a", "d"), ("a", "f")])
+
+        assert dic.get_first("a") == "b"
+
+    def test_get_last(self):
+        dic = FrozenMagicDict([("a", "b"), ("a", "d"), ("a", "f")])
+
+        assert dic.get_last("a") == "f"
+
+    def test_get_iter(self):
+        dic = FrozenMagicDict([("a", "b"), ("a", "d"), ("a", "f")])
+
+        assert list(dic.get_iter("a")) == ["b", "d", "f"]
+
+    def test_get_list(self):
+        dic = FrozenMagicDict([("a", "b"), ("a", "d"), ("a", "f")])
+
+        assert dic.get_list("a") == ["b", "d", "f"]
+
+    def test_copy(self):
+        dic = FrozenMagicDict([("a", "b"), ("a", "d"), ("a", "f")])
+
+        dic_copy = dic.copy()
+
+        assert dic == dic_copy
