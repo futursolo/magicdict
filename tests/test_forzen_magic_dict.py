@@ -36,3 +36,39 @@ class FrozenMagicDictTestCase:
         dic = FrozenMagicDict(**sample)
 
         assert sample.items() == dic.items()
+
+    def test_method_getitem(self):
+        dic = FrozenMagicDict([("a", "b"), ("a", "c")])
+
+        assert dic["a"] == "b"
+
+    def test_method_iter(self):
+        sample = [("a", "b"), ("c", "d"), ("c", "d"), ("e", "f")]
+        dic = FrozenMagicDict(sample)
+
+        list(iter(dic)) == ["a", "c", "c", "e"]
+
+    def test_method_len(self):
+        sample = [("a", "b"), ("c", "d"), ("c", "d"), ("e", "f")]
+        dic = FrozenMagicDict(sample)
+
+        assert len(dic) == 4
+
+    def test_method_contains(self):
+        sample = [("a", "b"), ("c", "d"), ("c", "d"), ("e", "f")]
+        dic = FrozenMagicDict(sample)
+
+        assert "a" in dic
+        assert "d" not in dic
+
+    def test_method_eq_ne(self):
+        sample = [("a", "b"), ("c", "d"), ("c", "d"), ("e", "f")]
+        dic = FrozenMagicDict(sample)
+
+        assert dic == sample
+        assert dic == dict(sample)
+
+        sample.append(("f", "g"))
+
+        assert dic != sample
+        assert dic != dict(sample)

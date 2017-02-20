@@ -22,7 +22,6 @@ from typing import Mapping, MutableMapping, TypeVar, KeysView, ValuesView, \
 
 from ._version import version, __version__
 
-import functools
 import threading
 import collections
 import threading
@@ -43,30 +42,9 @@ class _Identifier:
 _DEFAULT_MARK = _Identifier()
 
 
-@functools.total_ordering
-class _TotalOrdering(abc.ABC, Iterable[Any]):
+class _MagicKeysView(KeysView[_K], Generic[_K]):
     def __init__(self, map: Union["FrozenMagicDict", "MagicDict"]) -> None:
         self._map = map
-
-    @abc.abstractmethod
-    def __iter__(self) -> Iterator[Any]:
-        raise NotImplementedError
-
-    def __eq__(self, obj: Any) -> bool:
-        if hasattr(obj, "__reversed__") and callable(obj.__reversed__):
-            # If an object can be reversed, then it should have an order.
-            return list(self) == list(obj)
-
-        else:
-            return set(self) == set(obj)
-
-    def __lt__(self, obj: Any) -> bool:
-        return set(self) < set(obj)
-
-
-class _MagicKeysView(KeysView[_K], Generic[_K], _TotalOrdering):
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
-        _TotalOrdering.__init__(self, *args, **kwargs)
 
     def __len__(self) -> int:
         return len(self._map)
@@ -77,6 +55,29 @@ class _MagicKeysView(KeysView[_K], Generic[_K], _TotalOrdering):
 
     def __contains__(self, key: Any) -> bool:
         return key in self._map._pair_ids.keys()
+
+    def __eq__(self, obj: Any) -> bool:
+        if hasattr(obj, "__reversed__") and callable(obj.__reversed__):
+            # If an object can be reversed, then it should have an order.
+            return list(self) == list(obj)
+
+        else:
+            return set(self) == set(obj)
+
+    def __ne__(self, obj) -> bool:
+        return not self.__eq__(obj)
+
+    def __lt__(self, obj: Any) -> bool:
+        return set(self) < set(obj)
+
+    def __le__(self, obj: Any) -> bool:
+        return set(self) <= set(obj)
+
+    def __gt__(self, obj: Any) -> bool:
+        return set(self) > set(obj)
+
+    def __ge__(self, obj: Any) -> bool:
+        return set(self) >= set(obj)
 
     def __and__(self, obj: Iterable[Any]) -> Set[Any]:
         return set(self) & set(obj)
@@ -130,9 +131,9 @@ class _MagicValuesView(ValuesView[_V], Generic[_V]):
         return reversed(self._map).values()  # type: ignore
 
 
-class _MagicItemsView(ItemsView[_K, _V], Generic[_K, _V], _TotalOrdering):
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
-        _TotalOrdering.__init__(self, *args, **kwargs)
+class _MagicItemsView(ItemsView[_K, _V], Generic[_K, _V]):
+    def __init__(self, map: Union["FrozenMagicDict", "MagicDict"]) -> None:
+        self._map = map
 
     def __len__(self) -> int:
         return len(self._map)
@@ -143,6 +144,29 @@ class _MagicItemsView(ItemsView[_K, _V], Generic[_K, _V], _TotalOrdering):
 
     def __contains__(self, pair: Any) -> bool:
         return pair in self._map._kv_pairs.values()
+
+    def __eq__(self, obj: Any) -> bool:
+        if hasattr(obj, "__reversed__") and callable(obj.__reversed__):
+            # If an object can be reversed, then it should have an order.
+            return list(self) == list(obj)
+
+        else:
+            return set(self) == set(obj)
+
+    def __ne__(self, obj) -> bool:
+        return not self.__eq__(obj)
+
+    def __lt__(self, obj: Any) -> bool:
+        return set(self) < set(obj)
+
+    def __le__(self, obj: Any) -> bool:
+        return set(self) <= set(obj)
+
+    def __gt__(self, obj: Any) -> bool:
+        return set(self) > set(obj)
+
+    def __ge__(self, obj: Any) -> bool:
+        return set(self) >= set(obj)
 
     def __and__(self, obj: Iterable[Any]) -> Set[Any]:
         return set(self) & set(obj)
