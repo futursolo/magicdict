@@ -17,6 +17,8 @@
 
 from magicdict import FrozenMagicDict
 
+import pytest
+
 
 class FrozenMagicDictTestCase:
     def test_init_with_iter(self):
@@ -72,6 +74,7 @@ class FrozenMagicDictTestCase:
 
         assert dic != sample
         assert dic != dict(sample)
+        assert dic != 123
 
     def test_method_str(self):
         dic = FrozenMagicDict([("a", "b")])
@@ -89,10 +92,14 @@ class FrozenMagicDictTestCase:
 
         assert dic.get_first("a") == "b"
 
+        assert dic.get_first("b") is None
+
     def test_get_last(self):
         dic = FrozenMagicDict([("a", "b"), ("a", "d"), ("a", "f")])
 
         assert dic.get_last("a") == "f"
+
+        assert dic.get_last("b") is None
 
     def test_get_iter(self):
         dic = FrozenMagicDict([("a", "b"), ("a", "d"), ("a", "f")])

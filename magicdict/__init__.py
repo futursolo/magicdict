@@ -262,21 +262,13 @@ class FrozenMagicDict(Mapping[_K, _V], Generic[_K, _V]):
 
     def get_first(self, key: _K, default: Optional[_V]=None) -> Optional[_V]:
         if key not in self.keys():
-            if default is _DEFAULT_MARK:
-                raise KeyError(key)
-
-            else:
-                return default
+            return default
 
         return self[key]
 
     def get_last(self, key: _K, default: Optional[_V]=None) -> Optional[_V]:
         if key not in self.keys():
-            if default is _DEFAULT_MARK:
-                raise KeyError(key)
-
-            else:
-                return default
+            return default
 
         identifier = self._pair_ids[key][-1]
         _, value = self._kv_pairs[identifier]
@@ -455,3 +447,6 @@ class MagicDict(
 
         for key in keys:
             magic_dict.add(key, value)  # type: ignore
+
+    def copy(self) -> "MagicDict[_K, _V]":
+        return self.__class__(self)
