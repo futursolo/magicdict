@@ -18,12 +18,16 @@
 
 from typing import Mapping, MutableMapping, TypeVar, KeysView, ValuesView, \
     ItemsView, Generic, Iterator, Iterable, Tuple, Any, Optional, List, Set, \
-    Union
+    Union, Dict, MappingView
 
 from ._version import version, __version__
 
-import typing
 import functools
+import threading
+import collections
+import threading
+import collections.abc
+import abc
 
 __all__ = ["version", "__version__", "FrozenMagicDict", "MagicDict"]
 
@@ -40,87 +44,137 @@ _DEFAULT_MARK = _Identifier()
 
 
 @functools.total_ordering
-class _TotalOrdering:
-    def __eq__(self, obj: Any) -> bool:
+class _TotalOrdering(abc.ABC, Iterable[Any]):
+    def __init__(self, map: Union["FrozenMagicDict", "MagicDict"]) -> None:
+        self._map = map
+
+    @abc.abstractmethod
+    def __iter__(self) -> Iterator[Any]:
         raise NotImplementedError
 
+    def __eq__(self, obj: Any) -> bool:
+        if hasattr(obj, "__reversed__") and callable(obj.__reversed__):
+            # If an object can be reversed, then it should have an order.
+            return list(self) == list(obj)
+
+        else:
+            return set(self) == set(obj)
+
     def __lt__(self, obj: Any) -> bool:
-        raise NotImplementedError
+        return set(self) < set(obj)
 
 
 class _MagicKeysView(KeysView[_K], Generic[_K], _TotalOrdering):
     def __len__(self) -> int:
-        raise NotImplementedError
+        return len(self._map)
 
     def __iter__(self) -> Iterator[_K]:
-        raise NotImplementedError
+        with self._map._lock:
+            pairs = self._map._kv_pairs.values()
+
+        for key, _ in pairs:
+            yield key
 
     def __contains__(self, key: Any) -> bool:
-        raise NotImplementedError
+        with self._map._lock:
+            return key in self._map._pair_ids.keys()
 
     def __and__(self, obj: Iterable[Any]) -> Set[Any]:
-        raise NotImplementedError
+        return set(self) & set(obj)
 
     def __or__(self, obj: Iterable[Any]) -> Set[Any]:
-        raise NotImplementedError
+        return set(self) | set(obj)
 
     def __sub__(self, obj: Iterable[Any]) -> Set[Any]:
-        raise NotImplementedError
+        return set(self) - set(obj)
 
     def __xor__(self, obj: Iterable[Any]) -> Set[Any]:
-        raise NotImplementedError
+        return set(self) ^ set(obj)
 
     def __reversed__(self) -> KeysView[_K]:
-        raise NotImplementedError
+        return reversed(self._map).keys()  # type: ignore
 
 
 class _MagicValuesView(ValuesView[_V], Generic[_V]):
+    def __init__(self, map: Union["FrozenMagicDict", "MagicDict"]) -> None:
+        self._map = map
+
     def __len__(self) -> int:
-        raise NotImplementedError
+        return len(self._map)
 
-    def __iter__(self) -> Iterator[_K]:
-        raise NotImplementedError
+    def __iter__(self) -> Iterator[_V]:
+        with self._map._lock:
+            pairs = self._map._kv_pairs.values()
 
-    def __contains__(self, key: Any) -> bool:
-        raise NotImplementedError
+        for _, value in pairs:
+            yield value
+
+    def __contains__(self, value: Any) -> bool:
+        with self._map._lock:
+            pairs = self._map._kv_pairs.values()
+
+        for _, _value in pairs:
+            if _value == value:
+                return True
+
+        else:
+            return False
 
     def __eq__(self, obj: Any) -> bool:
-        raise NotImplementedError
+        if hasattr(obj, "__reversed__") and callable(obj.__reversed__):
+            # If an object can be reversed, then it should have an order.
+            return list(self) == list(obj)
+
+        else:
+            return set(self) == set(obj)
 
     def __ne__(self, obj: Any) -> bool:
-        raise NotImplementedError
+        return not self.__eq__(obj)
 
     def __reversed__(self) -> ValuesView[_V]:
-        raise NotImplementedError
+        return reversed(self._map).values()  # type: ignore
 
 
 class _MagicItemsView(ItemsView[_K, _V], Generic[_K, _V], _TotalOrdering):
     def __len__(self) -> int:
-        raise NotImplementedError
+        return len(self._map)
 
     def __iter__(self) -> Iterator[Tuple[_K, _V]]:
-        raise NotImplementedError
+        with self._map._lock:
+            pairs = self._map._kv_pairs.values()
 
-    def __contains__(self, key: Any) -> bool:
-        raise NotImplementedError
+        for key, value in pairs:
+            yield (key, value)
+
+    def __contains__(self, pair: Any) -> bool:
+        with self._map._lock:
+            return pair in self._map._kv_pairs.values()
 
     def __and__(self, obj: Iterable[Any]) -> Set[Any]:
-        raise NotImplementedError
+        return set(self) & set(obj)
 
     def __or__(self, obj: Iterable[Any]) -> Set[Any]:
-        raise NotImplementedError
+        return set(self) | set(obj)
 
     def __sub__(self, obj: Iterable[Any]) -> Set[Any]:
-        raise NotImplementedError
+        return set(self) - set(obj)
 
     def __xor__(self, obj: Iterable[Any]) -> Set[Any]:
-        raise NotImplementedError
+        return set(self) ^ set(obj)
 
     def __reversed__(self) -> ItemsView[_K, _V]:
-        raise NotImplementedError
+        return reversed(self._map).items()  # type: ignore
 
 
 class FrozenMagicDict(Mapping[_K, _V], Generic[_K, _V]):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        self._pair_ids: Dict[_K, List[_Identifier]] = {}
+        self._kv_pairs: \
+            "collections.OrderedDict[_Identifier, Tuple[_K, _V]]" = \
+            collections.OrderedDict()
+
+        self._lock = threading.Lock()
+
     def __getitem__(self, key: _K) -> _V:
         raise NotImplementedError
 
@@ -174,84 +228,203 @@ class FrozenMagicDict(Mapping[_K, _V], Generic[_K, _V]):
 
 
 class MagicDict(MutableMapping[_K, _V], Generic[_K, _V]):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        self._pair_ids: Dict[_K, List[_Identifier]] = {}
+        self._kv_pairs: \
+            "collections.OrderedDict[_Identifier, Tuple[_K, _V]]" = \
+            collections.OrderedDict()
+
+        self._lock = threading.Lock()
+
+        self.update(*args, **kwargs)
+
     def __getitem__(self, key: _K) -> _V:
-        raise NotImplementedError
+        with self._lock:
+            identifier = self._pair_ids[key][0]
+            _, value = self._kv_pairs[identifier]
+            return value
 
     def __setitem__(self, key: _K, value: _V) -> None:
-        raise NotImplementedError
+        if key in self.keys():
+            del self[key]
+
+        identifier = _Identifier()
+
+        with self._lock:
+            self._pair_ids[key] = [identifier]
+            self._kv_pairs[identifier] = (key, value)
 
     def __delitem__(self, key: _K) -> None:
-        raise NotImplementedError
+        with self._lock:
+            ids = self._pair_ids.pop(key)
+            for identifier in ids:
+                del self._kv_pairs[identifier]
 
     def __iter__(self) -> Iterator[_K]:
-        raise NotImplementedError
+        return iter(self.keys())
 
     def __len__(self) -> int:
-        raise NotImplementedError
+        return len(self._kv_pairs)
 
     def __contains__(self, key: Any) -> bool:
-        raise NotImplementedError
+        return key in self._pair_ids
 
     def __eq__(self, obj: Any) -> bool:
-        raise NotImplementedError
+        if isinstance(obj, collections.abc.Mapping):
+            return self.items() == obj.items()
+
+        if isinstance(obj, collections.abc.Iterable):
+            return self.items() == obj
+
+        return False
 
     def __ne__(self, obj: Any) -> bool:
-        raise NotImplementedError
+        return not self.__eq__(obj)
 
     def __str__(self) -> str:
-        raise NotImplementedError
+        return "{}({})".format(
+            self.__class__.__name__,
+            repr([(key, value) for (key, value) in self.items()]))
 
-    def __reversed__(self) -> FrozenMagicDict[_K, _V]:
-        raise NotImplementedError
+    def __reversed__(self) -> "MagicDict[_K, _V]":
+        with self._lock:
+            return self.__class__(reversed(list(self._kv_pairs.values())))
 
-    def get_first(self, key: _K, default: _V=None) -> Optional[_V]:
-        raise NotImplementedError
+    def get_first(self, key: _K, default: Optional[_V]=None) -> Optional[_V]:
+        if key not in self.keys():
+            if default is _DEFAULT_MARK:
+                raise KeyError(key)
 
-    def get_last(self, key: _K, default: _V=None) -> Optional[_V]:
-        raise NotImplementedError
+            else:
+                return default
 
-    def get_iter(self, key: _K, default: _V=None) -> Optional[_V]:
-        raise NotImplementedError
+        return self[key]
+
+    def get_last(self, key: _K, default: Optional[_V]=None) -> Optional[_V]:
+        if key not in self.keys():
+            if default is _DEFAULT_MARK:
+                raise KeyError(key)
+
+            else:
+                return default
+
+        with self._lock:
+            identifier = self._pair_ids[key][-1]
+            _, value = self._kv_pairs[identifier]
+            return value
+
+    def get_iter(self, key: _K) -> Iterator[_V]:
+        with self._lock:
+            vals = [
+                self._kv_pairs[identifier][1]
+                for identifier in self._pair_ids.get(key, [])]
+
+        for val in vals:
+            yield val
 
     def get_list(self, key: _K) -> List[_V]:
-        raise NotImplementedError
+        return list(self.get_iter(key))
 
     def add(self, key: _K, value: _V) -> None:
-        raise NotImplementedError
+        if key in self.keys():
+            identifier = _Identifier()
+
+            with self._lock:
+                self._pair_ids[key].append(identifier)
+                self._kv_pairs[identifier] = (key, value)
+
+        else:
+            self[key] = value
 
     def pop(
         self, key: _K,
             default: Union[_V, _Identifier]=_DEFAULT_MARK) -> _V:
-        raise NotImplementedError
+        if key not in self.keys():
+            if default is _DEFAULT_MARK:
+                raise KeyError(key)
+
+            else:
+                return default  # type: ignore
+
+        with self._lock:
+            identifier = self._pair_ids[key].pop()
+
+            if len(self._pair_ids[key]) == 0:
+                del self._pair_ids[key]
+
+            _, value = self._kv_pairs.pop(identifier)
+
+            return value
 
     def popitem(self) -> Tuple[_K, _V]:
-        raise NotImplementedError
+        with self._lock:
+            identifier, pair = self._kv_pairs.popitem()
+
+            key, _ = pair
+
+            self._pair_ids[key].remove(identifier)
+
+            if len(self._pair_ids[key]) == 0:
+                del self._pair_ids[key]
+
+            return pair
 
     def update(self, *args: Any, **kwargs: Any) -> None:  # Type Hints???
-        pass
+        if len(args):
+            if len(args) > 1:
+                raise TypeError(
+                    ("update expected at most 1 positional argument, "
+                     "got {} args.").format(len(args)))
+
+            else:
+                if isinstance(args[0], collections.abc.Mapping):
+                    for k, v in args[0].items():
+                        self.add(k, v)
+
+                elif isinstance(args[0], collections.abc.Iterable):
+                    for k, v in args[0]:
+                        self.add(k, v)
+
+                else:
+                    raise TypeError(
+                        ("update expected a Mapping or an Iterable "
+                         "as the positional argument, got {}.")
+                        .format(type(args[0])))
+
+        for k, v in kwargs.items():
+            self.add(k, v)
 
     def clear(self) -> None:
-        raise NotImplementedError
+        with self._lock:
+            self._kv_pairs.clear()
+            self._pair_ids.clear()
 
     def setdefault(self, key: _K, default: _V=None) -> _V:
-        raise NotImplementedError
+        if key in self.keys():
+            return self[key]
+
+        self[key] = default  # type: ignore
+        return default  # type: ignore
 
     @classmethod
     def fromkeys(
             Cls, keys: Iterable[_K], value: _V=None) -> "MagicDict[_K, _V]":
-        raise NotImplementedError
+        magic_dict: MagicDict[_K, _V] = Cls()
+
+        for key in keys:
+            magic_dict.add(key, value)  # type: ignore
 
     def copy(self) -> "MagicDict[_K, _V]":
-        raise NotImplementedError
+        return self.__class__(self)
 
     def keys(self) -> KeysView[_K]:
-        raise NotImplementedError
+        return _MagicKeysView(self)
 
     def values(self) -> ValuesView[_V]:
-        raise NotImplementedError
+        return _MagicValuesView(self)
 
     def items(self) -> ItemsView[_K, _V]:
-        raise NotImplementedError
+        return _MagicItemsView(self)
 
     get = get_first
     __repr__ = __str__
