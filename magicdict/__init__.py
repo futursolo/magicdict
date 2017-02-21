@@ -376,9 +376,9 @@ class MagicDict(
 
             return value
 
-    def popitem(self) -> Tuple[_K, _V]:
+    def popitem(self, last: bool=True) -> Tuple[_K, _V]:
         with self._lock:
-            identifier, pair = self._kv_pairs.popitem()
+            identifier, pair = self._kv_pairs.popitem(last)
 
             key, _ = pair
 
@@ -391,25 +391,24 @@ class MagicDict(
 
     def update(self, *args: Any, **kwargs: Any) -> None:  # Type Hints???
         if len(args):
-            if len(args) > 1:
+            if len(args) > 1:  # pragma: no cover
                 raise TypeError(
                     ("update expected at most 1 positional argument, "
                      "got {} args.").format(len(args)))
 
-            else:
-                if isinstance(args[0], collections.abc.Mapping):
+            elif isinstance(args[0], collections.abc.Mapping):
                     for k, v in args[0].items():
                         self.add(k, v)
 
-                elif isinstance(args[0], collections.abc.Iterable):
-                    for k, v in args[0]:
-                        self.add(k, v)
+            elif isinstance(args[0], collections.abc.Iterable):
+                for k, v in args[0]:
+                    self.add(k, v)
 
-                else:
-                    raise TypeError(
-                        ("update expected a Mapping or an Iterable "
-                         "as the positional argument, got {}.")
-                        .format(type(args[0])))
+            else:  # pragma: no cover
+                raise TypeError(
+                    ("update expected a Mapping or an Iterable "
+                     "as the positional argument, got {}.")
+                    .format(type(args[0])))
 
         for k, v in kwargs.items():
             self.add(k, v)

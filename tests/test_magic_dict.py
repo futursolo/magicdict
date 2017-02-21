@@ -69,6 +69,40 @@ class MagicDictTestCase:
         dic.add("a", "c")
         assert dic.get_list("a") == ["b", "c"]
 
+    def test_pop(self):
+        dic = MagicDict([("a", "b")])
+
+        assert len(dic) == 1
+
+        with pytest.raises(KeyError):
+            dic.pop("d")
+        assert dic.pop("d", "e") == "e"
+
+        assert dic.pop("a", "e") == "b"
+        assert len(dic) == 0
+
+    def test_popitem(self):
+        dic = MagicDict([("a", "b"), ("a", "c")])
+
+        assert dic.popitem() == ("a", "c")
+        assert dic.popitem() == ("a", "b")
+
+        with pytest.raises(KeyError):
+            dic.popitem()
+
+        dic = MagicDict([("a", "b"), ("a", "c")])
+
+        assert dic.popitem(False) == ("a", "b")
+
+    def test_update(self):
+        dic = MagicDict()
+
+        dic.update({"a": "b"})
+        assert dic.get_list("a") == ["b"]
+
+        dic.update([("a", "c")], a="d")
+        assert dic.get_list("a") == ["b", "c", "d"]
+
     def clear(self):
         dic = MagicDict([("a", "b"), ("a", "d"), ("a", "f")])
 
