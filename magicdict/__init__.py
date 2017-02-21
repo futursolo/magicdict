@@ -18,7 +18,7 @@
 
 from typing import Mapping, MutableMapping, TypeVar, KeysView, ValuesView, \
     ItemsView, Generic, Iterator, Iterable, Tuple, Any, Optional, List, Set, \
-    Union, Dict, MappingView, Reversible
+    Union, Dict, MappingView, Reversible, AnyStr
 
 from ._version import version, __version__
 
@@ -57,26 +57,21 @@ class _MagicKeysView(KeysView[_K], Generic[_K]):
         return key in self._map._pair_ids.keys()
 
     def __eq__(self, obj: Any) -> bool:
-        if hasattr(obj, "__reversed__") and callable(obj.__reversed__):
-            # If an object can be reversed, then it should have an order.
-            return list(self) == list(obj)
-
-        else:
-            return set(self) == set(obj)
+        return list(self) == list(obj)
 
     def __ne__(self, obj: Any) -> bool:
         return not self.__eq__(obj)
 
-    def __lt__(self, obj: Any) -> bool:
+    def __lt__(self, obj: Iterable[Any]) -> bool:
         return set(self) < set(obj)
 
-    def __le__(self, obj: Any) -> bool:
+    def __le__(self, obj: Iterable[Any]) -> bool:
         return set(self) <= set(obj)
 
-    def __gt__(self, obj: Any) -> bool:
+    def __gt__(self, obj: Iterable[Any]) -> bool:
         return set(self) > set(obj)
 
-    def __ge__(self, obj: Any) -> bool:
+    def __ge__(self, obj: Iterable[Any]) -> bool:
         return set(self) >= set(obj)
 
     def __and__(self, obj: Iterable[Any]) -> Set[Any]:
@@ -91,8 +86,14 @@ class _MagicKeysView(KeysView[_K], Generic[_K]):
     def __xor__(self, obj: Iterable[Any]) -> Set[Any]:
         return set(self) ^ set(obj)
 
-    def __reversed__(self) -> KeysView[_K]:
+    def __reversed__(self) -> "_MagicKeysView[_K]":
         return reversed(self._map).keys()  # type: ignore
+
+    def __str__(self) -> str:
+        return "{}({})".format(
+            self.__class__.__name__, repr([item for item in self]))
+
+    __repr__ = __str__
 
 
 class _MagicValuesView(ValuesView[_V], Generic[_V]):
@@ -115,18 +116,19 @@ class _MagicValuesView(ValuesView[_V], Generic[_V]):
             return False
 
     def __eq__(self, obj: Any) -> bool:
-        if hasattr(obj, "__reversed__") and callable(obj.__reversed__):
-            # If an object can be reversed, then it should have an order.
-            return list(self) == list(obj)
-
-        else:
-            return set(self) == set(obj)
+        return list(self) == list(obj)
 
     def __ne__(self, obj: Any) -> bool:
         return not self.__eq__(obj)
 
-    def __reversed__(self) -> ValuesView[_V]:
+    def __reversed__(self) -> "_MagicValuesView[_V]":
         return reversed(self._map).values()  # type: ignore
+
+    def __str__(self) -> str:
+        return "{}({})".format(
+            self.__class__.__name__, repr([item for item in self]))
+
+    __repr__ = __str__
 
 
 class _MagicItemsView(
@@ -145,26 +147,21 @@ class _MagicItemsView(
         return pair in self._map._kv_pairs.values()
 
     def __eq__(self, obj: Any) -> bool:
-        if hasattr(obj, "__reversed__") and callable(obj.__reversed__):
-            # If an object can be reversed, then it should have an order.
-            return list(self) == list(obj)
-
-        else:
-            return set(self) == set(obj)
+        return list(self) == list(obj)
 
     def __ne__(self, obj: Any) -> bool:
         return not self.__eq__(obj)
 
-    def __lt__(self, obj: Any) -> bool:
+    def __lt__(self, obj: Iterable[Any]) -> bool:
         return set(self) < set(obj)
 
-    def __le__(self, obj: Any) -> bool:
+    def __le__(self, obj: Iterable[Any]) -> bool:
         return set(self) <= set(obj)
 
-    def __gt__(self, obj: Any) -> bool:
+    def __gt__(self, obj: Iterable[Any]) -> bool:
         return set(self) > set(obj)
 
-    def __ge__(self, obj: Any) -> bool:
+    def __ge__(self, obj: Iterable[Any]) -> bool:
         return set(self) >= set(obj)
 
     def __and__(self, obj: Iterable[Any]) -> Set[Any]:
@@ -179,8 +176,14 @@ class _MagicItemsView(
     def __xor__(self, obj: Iterable[Any]) -> Set[Any]:
         return set(self) ^ set(obj)
 
-    def __reversed__(self) -> Iterator[Tuple[_K, _V]]:
+    def __reversed__(self) -> "_MagicItemsView[_K, _V]":  # type: ignore
         return reversed(self._map).items()  # type: ignore
+
+    def __str__(self) -> str:
+        return "{}({})".format(
+            self.__class__.__name__, repr([item for item in self]))
+
+    __repr__ = __str__
 
 
 class FrozenMagicDict(Reversible[_K], Mapping[_K, _V], Generic[_K, _V]):
@@ -237,7 +240,7 @@ class FrozenMagicDict(Reversible[_K], Mapping[_K, _V], Generic[_K, _V]):
         return len(self._kv_pairs)
 
     def __contains__(self, key: Any) -> bool:
-        return key in self._pair_ids
+        return key in self.keys()
 
     def __eq__(self, obj: Any) -> bool:
         if isinstance(obj, collections.abc.Mapping):
@@ -436,4 +439,211 @@ class MagicDict(
         return magic_dict
 
     def copy(self) -> "MagicDict[_K, _V]":
+        return self.__class__(self)
+
+
+class _TolerantMagicKeysView(_MagicKeysView[AnyStr], Generic[AnyStr]):
+    def __contains__(self, key: Any) -> bool:
+        try:
+            return super().__contains__(key.lower())
+
+        except AttributeError:
+            return False
+
+    def __eq__(self, obj: Any) -> bool:
+        if not isinstance(obj, collections.abc.Iterable):
+            return False
+
+        try:
+            lower_obj = [item.lower() for item in iter(obj)]
+
+        except AttributeError:
+            return False
+
+        return super().__eq__(lower_obj)
+
+    def __lt__(self, obj: Iterable[Any]) -> bool:
+        return super().__lt__([item.lower() for item in iter(obj)])
+
+    def __le__(self, obj: Iterable[Any]) -> bool:
+        return super().__le__([item.lower() for item in iter(obj)])
+
+    def __gt__(self, obj: Iterable[Any]) -> bool:
+        return super().__gt__([item.lower() for item in iter(obj)])
+
+    def __ge__(self, obj: Iterable[Any]) -> bool:
+        return super().__ge__([item.lower() for item in iter(obj)])
+
+    def __and__(self, obj: Iterable[Any]) -> Set[Any]:
+        return super().__and__([item.lower() for item in iter(obj)])
+
+    def __or__(self, obj: Iterable[Any]) -> Set[Any]:
+        return super().__or__([item.lower() for item in iter(obj)])
+
+    def __sub__(self, obj: Iterable[Any]) -> Set[Any]:
+        return super().__sub__([item.lower() for item in iter(obj)])
+
+    def __xor__(self, obj: Iterable[Any]) -> Set[Any]:
+        return super().__xor__([item.lower() for item in iter(obj)])
+
+    def __reversed__(self) -> "_TolerantMagicKeysView[AnyStr]":
+        return reversed(self._map).keys()  # type: ignore
+
+
+class _TolerantMagicItemsView(
+        _MagicItemsView[AnyStr, _V], Generic[AnyStr, _V]):
+    def __contains__(self, pair: Any) -> bool:
+        try:
+            lower_pair = (pair[0].lower(), pair[1])
+
+        except AttributeError:
+            return False
+
+        return super().__contains__(lower_pair)
+
+    def __eq__(self, obj: Any) -> bool:
+        if not isinstance(obj, collections.abc.Iterable):
+            return False
+
+        try:
+            lower_obj = [(k.lower(), v) for k, v in iter(obj)]
+
+        except AttributeError:
+            return False
+
+        return super().__eq__(lower_obj)
+
+    def __lt__(self, obj: Iterable[Any]) -> bool:
+        return super().__lt__([(k.lower(), v) for k, v in iter(obj)])
+
+    def __le__(self, obj: Iterable[Any]) -> bool:
+        return super().__le__([(k.lower(), v) for k, v in iter(obj)])
+
+    def __gt__(self, obj: Iterable[Any]) -> bool:
+        return super().__gt__([(k.lower(), v) for k, v in iter(obj)])
+
+    def __ge__(self, obj: Iterable[Any]) -> bool:
+        return super().__ge__([(k.lower(), v) for k, v in iter(obj)])
+
+    def __and__(self, obj: Iterable[Any]) -> Set[Any]:
+        return super().__and__([(k.lower(), v) for k, v in iter(obj)])
+
+    def __or__(self, obj: Iterable[Any]) -> Set[Any]:
+        return super().__or__([(k.lower(), v) for k, v in iter(obj)])
+
+    def __sub__(self, obj: Iterable[Any]) -> Set[Any]:
+        return super().__sub__([(k.lower(), v) for k, v in iter(obj)])
+
+    def __xor__(self, obj: Iterable[Any]) -> Set[Any]:
+        return super().__xor__([(k.lower(), v) for k, v in iter(obj)])
+
+    def __reversed__(  # type: ignore
+            self) -> "_TolerantMagicItemsView[AnyStr, _V]":
+        return reversed(self._map).keys()  # type: ignore
+
+
+class FrozenTolerantMagicDict(
+        FrozenMagicDict[AnyStr, _V], Generic[AnyStr, _V]):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        self._pair_ids: Dict[AnyStr, List[_Identifier]] = {}
+        self._kv_pairs: \
+            "collections.OrderedDict[_Identifier, Tuple[AnyStr, _V]]" = \
+            collections.OrderedDict()
+
+        def add_one(key: AnyStr, value: _V) -> None:
+            key = key.lower()
+            identifier = _Identifier()
+
+            if key not in self.keys():
+                self._pair_ids[key] = [identifier]
+
+            else:
+                self._pair_ids[key].append(identifier)
+
+            self._kv_pairs[identifier] = (key, value)
+
+        if len(args):
+            if len(args) > 1:  # pragma: no cover
+                raise TypeError(
+                    ("update expected at most 1 positional argument, "
+                     "got {} args.").format(len(args)))
+
+            else:
+                if isinstance(args[0], collections.abc.Mapping):
+                    for k, v in args[0].items():
+                        add_one(k, v)
+
+                elif isinstance(args[0], collections.abc.Iterable):
+                    for k, v in args[0]:
+                        add_one(k, v)
+
+                else:  # pragma: no cover
+                    raise TypeError(
+                        ("update expected a Mapping or an Iterable "
+                         "as the positional argument, got {}.")
+                        .format(type(args[0])))
+
+        for k, v in kwargs.items():
+            add_one(k, v)
+
+    def __getitem__(self, key: AnyStr) -> _V:
+        return super().__getitem__(key.lower())  # type: ignore
+
+    def get_first(
+            self, key: AnyStr, default: Optional[_V]=None) -> Optional[_V]:
+        return super().get_first(key.lower(), default=default)  # type: ignore
+
+    def get_last(
+            self, key: AnyStr, default: Optional[_V]=None) -> Optional[_V]:
+        return super().get_last(key.lower(), default=default)  # type: ignore
+
+    def get_iter(self, key: AnyStr) -> Iterator[_V]:
+        return super().get_iter(key.lower())  # type: ignore
+
+    def copy(self) -> "FrozenTolerantMagicDict[AnyStr, _V]":
+        return self.__class__(self)
+
+    def keys(self) -> _TolerantMagicKeysView[AnyStr]:
+        return _TolerantMagicKeysView(self)
+
+    def items(self) -> _TolerantMagicItemsView[AnyStr, _V]:
+        return _TolerantMagicItemsView(self)
+
+    get = get_first
+
+
+class TolerantMagicDict(  # type: ignore
+    FrozenTolerantMagicDict[AnyStr, _V],
+        MagicDict[AnyStr, _V], Generic[AnyStr, _V]):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        self._lock = threading.Lock()
+
+        FrozenTolerantMagicDict.__init__(self, *args, **kwargs)
+
+    def __getitem__(self, key: AnyStr) -> _V:
+        return MagicDict.__getitem__(self, key.lower())
+
+    def __setitem__(self, key: AnyStr, value: _V) -> None:
+        MagicDict.__setitem__(self, key.lower(), value)
+
+    def __delitem__(self, key: AnyStr) -> None:
+        MagicDict.__delitem__(self, key.lower())
+
+    def get_last(
+            self, key: AnyStr, default: Optional[_V]=None) -> Optional[_V]:
+        return MagicDict.get_last(  # type: ignore
+            self, key.lower(), default=default)
+
+    def get_iter(self, key: AnyStr) -> Iterator[_V]:
+        return MagicDict.get_iter(self, key.lower())
+
+    def add(self, key: AnyStr, value: _V) -> None:
+        MagicDict.add(self, key.lower(), value)
+
+    def pop(
+        self, key: AnyStr,
+            default: Union[_V, _Identifier]=_DEFAULT_MARK) -> _V:
+        return MagicDict.pop(self, key.lower(), default)
+
+    def copy(self) -> "TolerantMagicDict[AnyStr, _V]":
         return self.__class__(self)
