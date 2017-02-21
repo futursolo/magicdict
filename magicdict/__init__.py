@@ -329,11 +329,7 @@ class MagicDict(
 
     def get_last(self, key: _K, default: Optional[_V]=None) -> Optional[_V]:
         if key not in self.keys():
-            if default is _DEFAULT_MARK:
-                raise KeyError(key)
-
-            else:
-                return default
+            return default
 
         with self._lock:
             identifier = self._pair_ids[key][-1]

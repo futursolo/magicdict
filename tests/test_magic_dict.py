@@ -59,6 +59,34 @@ class MagicDictTestCase:
 
         assert list(dic.get_iter("a")) == ["b", "d", "f"]
 
+    def test_add(self):
+        dic = MagicDict()
+        assert dic.get_list("a") == []
+
+        dic.add("a", "b")
+        assert dic.get_list("a") == ["b"]
+
+        dic.add("a", "c")
+        assert dic.get_list("a") == ["b", "c"]
+
+    def clear(self):
+        dic = MagicDict([("a", "b"), ("a", "d"), ("a", "f")])
+
+        assert len(dic) == 3
+
+        dic.clear()
+
+        assert len(dic) == 0
+
+    def test_setdefault(self):
+        dic = MagicDict([("a", "b")])
+
+        dic.setdefault("a", "c")
+        dic.setdefault("e", "f")
+
+        assert dic["a"] == "b"
+        assert dic["e"] == "f"
+
     def test_fromkeys(self):
         dic = MagicDict.fromkeys(["a", "b", "b"], "d")
 
