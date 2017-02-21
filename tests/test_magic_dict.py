@@ -103,7 +103,7 @@ class MagicDictTestCase:
         dic.update([("a", "c")], a="d")
         assert dic.get_list("a") == ["b", "c", "d"]
 
-    def clear(self):
+    def test_clear(self):
         dic = MagicDict([("a", "b"), ("a", "d"), ("a", "f")])
 
         assert len(dic) == 3
