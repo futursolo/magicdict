@@ -299,16 +299,11 @@ class FrozenMagicDict(Reversible[_K], Mapping[_K, _V], Generic[_K, _V]):
 
 
 class MagicDict(
-        MutableMapping[_K, _V], FrozenMagicDict[_K, _V], Generic[_K, _V]):
+        FrozenMagicDict[_K, _V], MutableMapping[_K, _V], Generic[_K, _V]):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
-        self._pair_ids: Dict[_K, List[_Identifier]] = {}
-        self._kv_pairs: \
-            "collections.OrderedDict[_Identifier, Tuple[_K, _V]]" = \
-            collections.OrderedDict()
-
         self._lock = threading.Lock()
 
-        self.update(*args, **kwargs)
+        FrozenMagicDict.__init__(self, *args, **kwargs)
 
     def __getitem__(self, key: _K) -> _V:
         with self._lock:
@@ -442,6 +437,8 @@ class MagicDict(
 
         for key in keys:
             magic_dict.add(key, value)  # type: ignore
+
+        return magic_dict
 
     def copy(self) -> "MagicDict[_K, _V]":
         return self.__class__(self)
