@@ -541,7 +541,7 @@ class _TolerantMagicItemsView(
 
     def __reversed__(  # type: ignore
             self) -> "_TolerantMagicItemsView[AnyStr, _V]":
-        return reversed(self._map).keys()  # type: ignore
+        return reversed(self._map).items()  # type: ignore
 
 
 class FrozenTolerantMagicDict(

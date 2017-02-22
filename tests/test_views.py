@@ -124,6 +124,11 @@ class MagicKeysViewTestCase:
 
         assert dic.keys() ^ dic2.keys() == set(["e"])
 
+    def test_method_str(self):
+        dic = FrozenMagicDict([("a", "b")])
+
+        assert str(dic.keys()) == "_MagicKeysView(['a'])"
+
 
 class MagicValuesViewTestCase:
     def test_method_len(self):
@@ -158,6 +163,11 @@ class MagicValuesViewTestCase:
         dic = FrozenMagicDict(sample)
 
         assert reversed(dic.values()) == reversed([v for _, v in sample])
+
+    def test_method_str(self):
+        dic = FrozenMagicDict([("a", "b")])
+
+        assert str(dic.values()) == "_MagicValuesView(['b'])"
 
 
 class MagicItemsViewTestCase:
@@ -266,3 +276,8 @@ class MagicItemsViewTestCase:
         dic2 = FrozenMagicDict(sample2)
 
         assert dic.items() ^ dic2.items() == set([("e", "f")])
+
+    def test_method_str(self):
+        dic = FrozenMagicDict([("a", "b")])
+
+        assert str(dic.items()) == "_MagicItemsView([('a', 'b')])"
