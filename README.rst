@@ -45,6 +45,8 @@ Hence, code quality is really important. Basically, to be qualified for merging
 into master, the code should pass the mypy and pycodestyle check and
 have a 100% unit test coverage.
 
+The repository is hosted on `GitLab <https://gitlab.com/futursolo/magicdict>`_.
+
 License
 -------
 Copyright 2017 Kaede Hoshikawa
