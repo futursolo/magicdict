@@ -449,17 +449,17 @@ class _TolerantMagicKeysView(_MagicKeysView[AnyStr], Generic[AnyStr]):
         try:
             return super().__contains__(key.lower())
 
-        except AttributeError:
+        except AttributeError:  # pragma: no cover
             return False
 
     def __eq__(self, obj: Any) -> bool:
-        if not isinstance(obj, collections.abc.Iterable):
+        if not isinstance(obj, collections.abc.Iterable):  # pragma: no cover
             return False
 
         try:
             lower_obj = [item.lower() for item in iter(obj)]
 
-        except AttributeError:
+        except AttributeError:  # pragma: no cover
             return False
 
         return super().__eq__(lower_obj)
@@ -498,19 +498,19 @@ class _TolerantMagicItemsView(
         try:
             lower_pair = (pair[0].lower(), pair[1])
 
-        except AttributeError:
+        except AttributeError:  # pragma: no cover
             return False
 
         return super().__contains__(lower_pair)
 
     def __eq__(self, obj: Any) -> bool:
-        if not isinstance(obj, collections.abc.Iterable):
+        if not isinstance(obj, collections.abc.Iterable):  # pragma: no cover
             return False
 
         try:
             lower_obj = [(k.lower(), v) for k, v in iter(obj)]
 
-        except AttributeError:
+        except AttributeError:  # pragma: no cover
             return False
 
         return super().__eq__(lower_obj)
