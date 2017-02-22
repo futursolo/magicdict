@@ -8,6 +8,43 @@ magicdict
 
 An ordered, one-to-many mapping.
 
+Thread Safety
+-------------
+`FrozenMagicDict` and its classes should be thread safe without additional
+locking. If any data races occurred during using, then that's a bug. Please
+file an issue with reproducing procedure.
+
+Usage
+-----
+`MagicDict` should function like a `collections.OrderedDict` except
+`move_to_end` is not defined and the item selection always returns the first
+item. It it is not, submit an issue.
+
+`FrozenMagicDict` is an immutable version of `MagicDict`.
+Also, compared to `MagicDict`, `FrozenMagicDict` is lockless. Hence,
+when an action is available in both dictionaries, `FrozenMagicDict` is usually
+faster.
+
+`FrozenTolerantMagicDict` and `TolerantMagicDict` are case-insensitive version
+of `FrozenMagicDict` and `MagicDict` respectively.
+
+`get_first`, `get_last`, `get_iter`, and `get_list`:
+These methods are available in `FrozenMagicDict` and its subclasses to get the
+elements. For more details, please read the comments of each method.
+
+`add`:
+Method `add` is available in `MagicDict` and `TolerantMagicDict`. This method
+is used as an instead of `dic["key"] = "value"` as it can append a value to the
+dictionary without removing the former one. Setting values like normal
+`OrderedDict` will clear the stored value(s) if any.
+
+Contributing
+------------
+Data Structure is one of the bedrocks of all the other Python applications.
+Hence, code quality is really important. Basically, to be qualified for merging
+into master, the code should pass the mypy and pycodestyle check and
+have a 100% unit test coverage.
+
 License
 -------
 Copyright 2017 Kaede Hoshikawa

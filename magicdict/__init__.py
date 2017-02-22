@@ -189,6 +189,9 @@ class _MagicItemsView(
 
 
 class FrozenMagicDict(Reversible[_K], Mapping[_K, _V], Generic[_K, _V]):
+    """
+    An immutable ordered, one-to-many Mapping.
+    """
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         self._pair_ids: Dict[_K, List[_Identifier]] = {}
         self._kv_pairs: \
@@ -265,12 +268,20 @@ class FrozenMagicDict(Reversible[_K], Mapping[_K, _V], Generic[_K, _V]):
         return self.__class__(reversed(list(self.items())))
 
     def get_first(self, key: _K, default: Optional[_V]=None) -> Optional[_V]:
+        """
+        Get the first item matching the key.
+        If not present, return the default.
+        """
         if key not in self.keys():
             return default
 
         return self[key]
 
     def get_last(self, key: _K, default: Optional[_V]=None) -> Optional[_V]:
+        """
+        Get the last item matching the key.
+        If not present, return the default.
+        """
         if key not in self.keys():
             return default
 
@@ -279,12 +290,18 @@ class FrozenMagicDict(Reversible[_K], Mapping[_K, _V], Generic[_K, _V]):
         return value
 
     def get_iter(self, key: _K) -> Iterator[_V]:
+        """
+        Get an iterator that iterates over all the items matching the key.
+        """
         for identifier in self._pair_ids.get(key, []):
             _, value = self._kv_pairs[identifier]
 
             yield value
 
     def get_list(self, key: _K) -> List[_V]:
+        """
+        Get a list that contains all the items matching the key.
+        """
         return list(self.get_iter(key))
 
     def copy(self) -> "FrozenMagicDict[_K, _V]":
@@ -305,6 +322,9 @@ class FrozenMagicDict(Reversible[_K], Mapping[_K, _V], Generic[_K, _V]):
 
 class MagicDict(
         FrozenMagicDict[_K, _V], MutableMapping[_K, _V], Generic[_K, _V]):
+    """
+    A mutable version of `FrozenMagicDict`.
+    """
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         self._lock = threading.Lock()
 
@@ -333,6 +353,10 @@ class MagicDict(
                 del self._kv_pairs[identifier]
 
     def get_last(self, key: _K, default: Optional[_V]=None) -> Optional[_V]:
+        """
+        This function behaves the same as the one in  `FrozenMagicDict`
+        but adds additional locking to ensure thread safety.
+        """
         if key not in self.keys():
             return default
 
@@ -342,6 +366,10 @@ class MagicDict(
             return value
 
     def get_iter(self, key: _K) -> Iterator[_V]:
+        """
+        This function behaves the same as the one in  `FrozenMagicDict`
+        but adds additional locking to ensure thread safety.
+        """
         with self._lock:
             vals = [
                 self._kv_pairs[identifier][1]
@@ -351,6 +379,9 @@ class MagicDict(
             yield val
 
     def add(self, key: _K, value: _V) -> None:
+        """
+        Add a value corresponding to the key without removing the former one.
+        """
         if key in self.keys():
             identifier = _Identifier()
 
@@ -382,6 +413,11 @@ class MagicDict(
             return value
 
     def popitem(self, last: bool=True) -> Tuple[_K, _V]:
+        """
+        This method behaves exactly like `collections.OrderedDict.popitem`.
+
+        If `last` is `True` then the items will popped by LIFO, else FIFO.
+        """
         with self._lock:
             identifier, pair = self._kv_pairs.popitem(last)
 
@@ -546,6 +582,10 @@ class _TolerantMagicItemsView(
 
 class FrozenTolerantMagicDict(
         FrozenMagicDict[AnyStr, _V], Generic[AnyStr, _V]):
+    """
+    `FrozenTolerantMagicDict` has exactly the same functionality as
+    `FrozenMagicDict`. However, the keys are case-insensitive.
+    """
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         self._pair_ids: Dict[AnyStr, List[_Identifier]] = {}
         self._kv_pairs: \
@@ -617,6 +657,10 @@ class FrozenTolerantMagicDict(
 class TolerantMagicDict(  # type: ignore
     FrozenTolerantMagicDict[AnyStr, _V],
         MagicDict[AnyStr, _V], Generic[AnyStr, _V]):
+    """
+    `TolerantMagicDict` has exactly the same functionality as
+    `MagicDict`. However, the keys are case-insensitive.
+    """
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         self._lock = threading.Lock()
 
