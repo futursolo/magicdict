@@ -68,12 +68,10 @@ class FrozenMagicDictTestCase:
         dic = FrozenMagicDict(sample)
 
         assert dic == sample
-        assert dic == dict(sample)
 
         sample.append(("f", "g"))
 
         assert dic != sample
-        assert dic != dict(sample)
         assert dic != 123
 
     def test_method_str(self):

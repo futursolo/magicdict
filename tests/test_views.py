@@ -43,7 +43,6 @@ class MagicKeysViewTestCase:
         dic = FrozenMagicDict(sample)
 
         assert dic.keys() == [k for k, _ in sample]
-        assert dic.keys() == set([k for k, _ in sample])
 
         assert dic.keys() != []
 
@@ -51,8 +50,7 @@ class MagicKeysViewTestCase:
         sample = [("a", "b"), ("c", "d"), ("c", "d"), ("e", "f")]
         dic = FrozenMagicDict(sample)
 
-        assert reversed(dic.keys()) == reversed(
-            [k for k, _ in reversed(sample)])
+        assert reversed(dic.keys()) == reversed([k for k, _ in sample])
 
     def test_method_lt(self):
         sample = [("a", "b"), ("c", "d")]
@@ -126,6 +124,11 @@ class MagicKeysViewTestCase:
 
         assert dic.keys() ^ dic2.keys() == set(["e"])
 
+    def test_method_str(self):
+        dic = FrozenMagicDict([("a", "b")])
+
+        assert str(dic.keys()) == "_MagicKeysView(['a'])"
+
 
 class MagicValuesViewTestCase:
     def test_method_len(self):
@@ -152,7 +155,6 @@ class MagicValuesViewTestCase:
         dic = FrozenMagicDict(sample)
 
         assert dic.values() == [v for _, v in sample]
-        assert dic.values() == set([v for _, v in sample])
 
         assert dic.values() != []
 
@@ -160,8 +162,12 @@ class MagicValuesViewTestCase:
         sample = [("a", "b"), ("c", "d"), ("c", "d"), ("e", "f")]
         dic = FrozenMagicDict(sample)
 
-        assert reversed(dic.values()) == reversed(
-            [v for _, v in reversed(sample)])
+        assert reversed(dic.values()) == reversed([v for _, v in sample])
+
+    def test_method_str(self):
+        dic = FrozenMagicDict([("a", "b")])
+
+        assert str(dic.values()) == "_MagicValuesView(['b'])"
 
 
 class MagicItemsViewTestCase:
@@ -189,7 +195,6 @@ class MagicItemsViewTestCase:
         dic = FrozenMagicDict(sample)
 
         assert dic.items() == sample
-        assert dic.items() == set(sample)
 
         assert dic.items() != []
 
@@ -271,3 +276,8 @@ class MagicItemsViewTestCase:
         dic2 = FrozenMagicDict(sample2)
 
         assert dic.items() ^ dic2.items() == set([("e", "f")])
+
+    def test_method_str(self):
+        dic = FrozenMagicDict([("a", "b")])
+
+        assert str(dic.items()) == "_MagicItemsView([('a', 'b')])"

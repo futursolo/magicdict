@@ -37,7 +37,7 @@ unittest-3-6-0-linux:
   script:
     - python -m coverage run --source=magicdict setup.py test
   after_script:
-    - codecov --token=$CODECOV_TOKEN
+    - codecov --token=$CODECOV_TOKEN --branch=$CI_BUILD_REF_NAME
 
 packaging-3-6-0-linux:
   image: python:3.6.0
