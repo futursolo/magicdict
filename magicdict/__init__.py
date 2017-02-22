@@ -28,7 +28,9 @@ import threading
 import collections.abc
 import abc
 
-__all__ = ["version", "__version__", "FrozenMagicDict", "MagicDict"]
+__all__ = [
+    "version", "__version__", "FrozenMagicDict", "MagicDict",
+    "FrozenTolerantMagicDict", "TolerantMagicDict"]
 
 _K = TypeVar("_K")
 
