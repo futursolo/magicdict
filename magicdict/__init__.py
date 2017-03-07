@@ -316,7 +316,7 @@ class FrozenMagicDict(Reversible[_K], Mapping[_K, _V], Generic[_K, _V]):
     def items(self) -> _MagicItemsView[_K, _V]:
         return _MagicItemsView(self)
 
-    get = get_first
+    get = get_first  # type: ignore
     __repr__ = __str__
 
 
@@ -651,7 +651,7 @@ class FrozenTolerantMagicDict(
     def items(self) -> _TolerantMagicItemsView[AnyStr, _V]:
         return _TolerantMagicItemsView(self)
 
-    get = get_first
+    get = get_first  # type: ignore
 
 
 class TolerantMagicDict(  # type: ignore
