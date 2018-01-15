@@ -49,7 +49,7 @@ The repository is hosted on `GitLab <https://gitlab.com/futursolo/magicdict>`_.
 
 License
 -------
-Copyright 2017 Kaede Hoshikawa
+Copyright 2018 Kaede Hoshikawa
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

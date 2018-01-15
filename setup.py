@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-#   Copyright 2017 Kaede Hoshikawa
+#   Copyright 2018 Kaede Hoshikawa
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -24,28 +24,29 @@ import sys
 if not sys.version_info[:3] >= (3, 6, 0):
     raise RuntimeError("Magicdict requires Python 3.6.0 or higher.")
 
+else:
+    try:
+        import _modify_version
 
-def load_version(module_name):
-    _version_spec = importlib.util.spec_from_file_location(
-        "{}._version".format(module_name),
-        os.path.join(
-            os.path.dirname(os.path.abspath(__file__)),
-            "{}/_version.py".format(module_name)))
-    _version = importlib.util.module_from_spec(_version_spec)
-    _version_spec.loader.exec_module(_version)
-    return _version.version
+    except ImportError:
+        pass
+
+    else:
+        _modify_version.modify("magicdict")
+
+    import _load_version
 
 
-setup_requires = ["setuptools", "pytest-runner>=2.11.1,<3"]
+setup_requires = open("setup-requirements.txt").read().split("\n")
 
-install_requires = []
+install_requires = open("requirements.txt").read().split("\n")
 
-tests_require = ["pytest>=3.0.6,<4"]
+tests_require = open("test-requirements.txt").read().split("\n")
 
 if __name__ == "__main__":
     setup(
         name="magicdict",
-        version=load_version("magicdict"),
+        version=_load_version.load("magicdict"),
         author="Kaede Hoshikawa",
         author_email="futursolo@icloud.com",
         url="https://gitlab.com/futursolo/magicdict",

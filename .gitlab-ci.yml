@@ -1,53 +1,38 @@
 stages:
-  - mypy
-  - pycodestyle
-  - unittest
+  - testing
   - packaging
 
-mypy-3-6-0-linux:
-  image: python:3.6.0
-  stage: mypy
-  before_script:
-    - pip install -U setuptools pip
-    - pip install . -U
+before_script:
+  - export CURRENT_COMMIT_NO=$(git rev-list --count $CI_COMMIT_SHA)
 
-    - pip install -U mypy
+  - pip install -U pip wheel
+
+  - pip install -U -r setup-requirements.txt
+  - pip install -U -r test-requirements.txt
+
+  - pip install --editable .
+
+  - pip install -U codecov coverage
+
+testing-3-6-linux:
+  image: python:3.6
+  stage: testing
+
   script:
-    - mypy --fast-parser --python-version 3.6 --disallow-untyped-calls --disallow-untyped-defs --warn-unused-ignores --show-traceback --strict-optional --ignore-missing-imports --follow-imports=skip --show-error-context --show-traceback -p magicdict
-
-pycodestyle-3-6-0-linux:
-  image: python:3.6.0
-  stage: pycodestyle
-  before_script:
-    - pip install -U setuptools pip
-    - pip install . -U
-
-    - pip install -U pycodestyle
-  script:
+    - mypy --python-version 3.6 --disallow-untyped-calls --disallow-untyped-defs --warn-unused-ignores --show-traceback --strict-optional --ignore-missing-imports --show-error-context magicdict
     - pycodestyle --show-source magicdict
-
-unittest-3-6-0-linux:
-  image: python:3.6.0
-  stage: unittest
-  before_script:
-    - pip install -U setuptools pip
-    - pip install ".[test]" -U
-
-    - pip install -U codecov coverage
-  script:
     - python -m coverage run --source=magicdict setup.py test
+
   after_script:
     - codecov --token=$CODECOV_TOKEN --branch=$CI_BUILD_REF_NAME
 
-packaging-3-6-0-linux:
-  image: python:3.6.0
+packaging-3-6-linux:
+  image: python:3.6
   stage: packaging
-  before_script:
-    - pip install -U setuptools pip wheel
-    - pip install ".[test]" -U
 
   script:
     - python setup.py sdist bdist_wheel
+
   artifacts:
     paths:
       - dist/
