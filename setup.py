@@ -35,11 +35,15 @@ else:
     import _load_version
 
 
-setup_requires = open("setup-requirements.txt").read().split("\n")
+setup_requires = [
+    i for i in open("setup-requirements.txt").read().split("\n") if i]
 
-install_requires = open("requirements.txt").read().split("\n")
+install_requires = [
+    i for i in open("requirements.txt").read().split("\n") if i]
 
-tests_require = open("test-requirements.txt").read().split("\n")
+tests_require = [
+    i for i in open("test-requirements.txt").read().split("\n") if i]
+
 
 if __name__ == "__main__":
     setup(
@@ -69,7 +73,6 @@ if __name__ == "__main__":
             "Operating System :: POSIX :: Linux",
             "Operating System :: Unix",
             "Programming Language :: Python",
-            "Programming Language :: Python :: 3 :: Only",
-            "Programming Language :: Python :: Implementation :: CPython"
+            "Programming Language :: Python :: 3 :: Only"
         ]
     )
