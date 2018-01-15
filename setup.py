@@ -17,8 +17,6 @@
 
 from setuptools import setup, find_packages
 
-import importlib
-import os
 import sys
 
 if not sys.version_info[:3] >= (3, 6, 0):

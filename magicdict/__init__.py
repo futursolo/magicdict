@@ -18,23 +18,23 @@
 
 from typing import Mapping, MutableMapping, TypeVar, KeysView, ValuesView, \
     ItemsView, Generic, Iterator, Iterable, Tuple, Any, Optional, List, Set, \
-    Union, Dict, MappingView, Reversible, AnyStr
+    Union, Dict, Reversible, AnyStr
 
-from ._version import version, __version__
+from ._version import __version__
 
 import threading
 import collections
-import threading
 import collections.abc
-import abc
 
 __all__ = [
-    "version", "__version__", "FrozenMagicDict", "MagicDict",
-    "FrozenTolerantMagicDict", "TolerantMagicDict"]
+    "__version__", "FrozenMagicDict", "MagicDict", "FrozenTolerantMagicDict",
+    "TolerantMagicDict"]
 
 _K = TypeVar("_K")
 
 _V = TypeVar("_V")
+
+_T = TypeVar("_T")
 
 
 class _Identifier:
@@ -393,8 +393,8 @@ class MagicDict(
             self[key] = value
 
     def pop(
-        self, key: _K,
-            default: Union[_V, _Identifier]=_DEFAULT_MARK) -> _V:
+        self, key: _K, default: Union[_V, _T, _Identifier]=_DEFAULT_MARK
+            ) -> Union[_V, _T]:
         if key not in self.keys():
             if default is _DEFAULT_MARK:
                 raise KeyError(key)
@@ -687,9 +687,9 @@ class TolerantMagicDict(  # type: ignore
         MagicDict.add(self, key.lower(), value)
 
     def pop(
-        self, key: AnyStr,
-            default: Union[_V, _Identifier]=_DEFAULT_MARK) -> _V:
-        return MagicDict.pop(self, key.lower(), default)
+        self, key: AnyStr, default: Union[_V, _T, _Identifier]=_DEFAULT_MARK
+            ) -> Union[_V, _T]:
+        return MagicDict.pop(self, key.lower(), default)  # type: ignore
 
     def copy(self) -> "TolerantMagicDict[AnyStr, _V]":
         return self.__class__(self)

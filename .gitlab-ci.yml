@@ -20,11 +20,13 @@ testing-3-6-linux:
 
   script:
     - mypy --python-version 3.6 --disallow-untyped-calls --disallow-untyped-defs --warn-unused-ignores --show-traceback --strict-optional --ignore-missing-imports --show-error-context magicdict
-    - pycodestyle --show-source magicdict
+    - flake8 .
     - python -m coverage run --source=magicdict setup.py test
 
+    - export SCRIPT_SUCCEED="1"
+
   after_script:
-    - codecov --token=$CODECOV_TOKEN --branch=$CI_BUILD_REF_NAME
+    - if [[ "$SCRIPT_SUCCEED" == "1" ]]; then codecov --token=$CODECOV_TOKEN --branch=$CI_BUILD_REF_NAME ; fi
 
 packaging-3-6-linux:
   image: python:3.6

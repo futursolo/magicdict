@@ -17,8 +17,6 @@
 
 from magicdict import FrozenTolerantMagicDict
 
-import pytest
-
 
 class FrozenMagicDictTestCase:
     def test_init_with_iter(self):
