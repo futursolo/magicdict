@@ -23,10 +23,7 @@ testing-3-6-linux:
     - flake8 .
     - python -m coverage run --source=magicdict setup.py test
 
-    - export SCRIPT_SUCCEED="1"
-
-  after_script:
-    - if [[ "$SCRIPT_SUCCEED" == "1" ]]; then codecov --token=$CODECOV_TOKEN --branch=$CI_BUILD_REF_NAME ; fi
+    - codecov --token=$CODECOV_TOKEN --branch=$CI_BUILD_REF_NAME
 
 packaging-3-6-linux:
   image: python:3.6
