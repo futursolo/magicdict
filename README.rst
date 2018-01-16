@@ -40,11 +40,6 @@ dictionary without removing the former one. Setting values like normal
 
 Contributing
 ------------
-Data Structure is one of the bedrocks of all the other Python applications.
-Hence, code quality is really important. Basically, to be qualified for merging
-into master, the code should pass the mypy and pycodestyle check and
-have a 100% unit test coverage.
-
 The repository is hosted on `GitLab <https://gitlab.com/futursolo/magicdict>`_.
 
 License
