@@ -25,19 +25,17 @@ import typing
 import collections
 
 if typing.TYPE_CHECKING:  # pragma: no cover
-    from .__init__ import FrozenMagicDict, MagicDict  # noqa: F401
+    from .__init__ import FrozenMagicDict  # noqa: F401
 
 __all__ = ["MagicKeysView"]
 
 _K = TypeVar("_K")
 
-_V = TypeVar("_V")
-
 _T = TypeVar("_T")
 
 
 class MagicKeysView(KeysView[_K], Reversible[_K], Generic[_K]):
-    def __init__(self, __map: "MagicDict[_K, _V]") -> None:
+    def __init__(self, __map: "FrozenMagicDict[_K, Any]") -> None:
         self._map = __map
 
     def __len__(self) -> int:
@@ -94,8 +92,7 @@ class MagicKeysView(KeysView[_K], Reversible[_K], Generic[_K]):
     __repr__ = __str__
 
 
-class TolerantMagicKeysView(
-        MagicKeysView[AnyStr], Generic[AnyStr]):
+class TolerantMagicKeysView(MagicKeysView[AnyStr], Generic[AnyStr]):
     def __contains__(self, key: Any) -> bool:
         try:
             return super().__contains__(key.lower())
@@ -146,8 +143,7 @@ class TolerantMagicKeysView(
     def __and__(self, obj: Iterable[Any]) -> Set[AnyStr]:
         return super().__and__(lower_items_reduced(obj))  # type: ignore
 
-    def __or__(self, obj: Iterable[_T]) -> Set[
-            Union[AnyStr, _T]]:
+    def __or__(self, obj: Iterable[_T]) -> Set[Union[AnyStr, _T]]:
         return super().__or__(lower_items_if_possible(obj))  # type: ignore
 
     def __sub__(self, obj: Iterable[Any]) -> Set[AnyStr]:

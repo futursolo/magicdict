@@ -16,22 +16,23 @@
 #   limitations under the License.
 
 
-from typing import Mapping, MutableMapping, TypeVar, ValuesView, \
+from typing import Mapping, MutableMapping, TypeVar, \
     ItemsView, Generic, Iterator, Iterable, Tuple, Any, Optional, List, Set, \
     Union, Dict, Reversible, AnyStr
 
 from ._version import __version__  # noqa: F401
 from ._keys_view import MagicKeysView, TolerantMagicKeysView
+from ._values_view import MagicValuesView
 
 from . import _keys_view
+from . import _values_view
 
 import threading
 import collections
-import collections.abc
 
 __all__ = [
     "__version__", "FrozenMagicDict", "MagicDict", "FrozenTolerantMagicDict",
-    "TolerantMagicDict"] + _keys_view.__all__
+    "TolerantMagicDict"] + _keys_view.__all__ + _values_view.__all__
 
 _K = TypeVar("_K")
 
@@ -45,41 +46,6 @@ class _Identifier:
 
 
 _DEFAULT_MARK = _Identifier()
-
-
-class _MagicValuesView(ValuesView[_V], Generic[_V]):
-    def __init__(self, map: Union["FrozenMagicDict", "MagicDict"]) -> None:
-        self._map = map
-
-    def __len__(self) -> int:
-        return len(self._map)
-
-    def __iter__(self) -> Iterator[_V]:
-        for _, value in list(self._map._kv_pairs.values()):
-            yield value
-
-    def __contains__(self, value: Any) -> bool:
-        for _, _value in list(self._map._kv_pairs.values()):
-            if _value == value:
-                return True
-
-        else:
-            return False
-
-    def __eq__(self, obj: Any) -> bool:
-        return list(self) == list(obj)
-
-    def __ne__(self, obj: Any) -> bool:
-        return not self.__eq__(obj)
-
-    def __reversed__(self) -> "_MagicValuesView[_V]":
-        return reversed(self._map).values()  # type: ignore
-
-    def __str__(self) -> str:
-        return "{}({})".format(
-            self.__class__.__name__, repr([item for item in self]))
-
-    __repr__ = __str__
 
 
 class _MagicItemsView(
@@ -259,8 +225,8 @@ class FrozenMagicDict(Reversible[_K], Mapping[_K, _V], Generic[_K, _V]):
     def keys(self) -> MagicKeysView[_K]:
         return MagicKeysView(self)
 
-    def values(self) -> _MagicValuesView[_V]:
-        return _MagicValuesView(self)
+    def values(self) -> MagicValuesView[_V]:
+        return MagicValuesView(self)
 
     def items(self) -> _MagicItemsView[_K, _V]:
         return _MagicItemsView(self)

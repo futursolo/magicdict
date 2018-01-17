@@ -18,46 +18,6 @@
 from magicdict import FrozenMagicDict
 
 
-class MagicValuesViewTestCase:
-    def test_method_len(self):
-        sample = [("a", "b"), ("c", "d"), ("c", "d"), ("e", "f")]
-        dic = FrozenMagicDict(sample)
-
-        assert len(dic.values()) == 4
-
-    def test_method_iter(self):
-        sample = [("a", "b"), ("c", "d"), ("c", "d"), ("e", "f")]
-        dic = FrozenMagicDict(sample)
-
-        assert list(iter(dic.values())) == ["b", "d", "d", "f"]
-
-    def test_method_contains(self):
-        sample = [("a", "b"), ("c", "d"), ("c", "d"), ("e", "f")]
-        dic = FrozenMagicDict(sample)
-
-        assert "b" in dic.values()
-        assert "g" not in dic.values()
-
-    def test_method_eq_ne(self):
-        sample = [("a", "b"), ("c", "d"), ("c", "d"), ("e", "f")]
-        dic = FrozenMagicDict(sample)
-
-        assert dic.values() == [v for _, v in sample]
-
-        assert dic.values() != []
-
-    def test_method_reversed(self):
-        sample = [("a", "b"), ("c", "d"), ("c", "d"), ("e", "f")]
-        dic = FrozenMagicDict(sample)
-
-        assert reversed(dic.values()) == reversed([v for _, v in sample])
-
-    def test_method_str(self):
-        dic = FrozenMagicDict([("a", "b")])
-
-        assert str(dic.values()) == "_MagicValuesView(['b'])"
-
-
 class MagicItemsViewTestCase:
     def test_method_len(self):
         sample = [("a", "b"), ("c", "d"), ("c", "d"), ("e", "f")]
