@@ -15,12 +15,12 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from typing import ValuesView, Generic, Union, Iterator, Any, TypeVar
+from typing import ValuesView, Generic, Iterator, Any, TypeVar
 
 import typing
 import collections
 
-if typing.TYPE_CHECKING:
+if typing.TYPE_CHECKING:  # pragma: no cover
     from .__init__ import FrozenMagicDict  # noqa: F401
 
 __all__ = ["MagicValuesView"]
@@ -31,18 +31,18 @@ _T = TypeVar("_T")
 
 
 class MagicValuesView(ValuesView[_V], Generic[_V]):
-    def __init__(self, __map: Union["FrozenMagicDict[Any, _V]"]) -> None:
+    def __init__(self, __map: "FrozenMagicDict[Any, _V]") -> None:
         self._map = __map
 
     def __len__(self) -> int:
         return len(self._map)
 
     def __iter__(self) -> Iterator[_V]:
-        for _, value in list(self._map._kv_pairs.values()):
+        for _, value in self._map._kv_pairs.values():
             yield value
 
     def __contains__(self, value: Any) -> bool:
-        for _, _value in list(self._map._kv_pairs.values()):
+        for _, _value in self._map._kv_pairs.values():
             if _value == value:
                 return True
 

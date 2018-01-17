@@ -19,8 +19,6 @@ from typing import \
     Iterator, KeysView, Generic, Union, Iterable, Set, Any, Reversible, \
     AnyStr, TypeVar
 
-from ._utils import lower_items_reduced, lower_items_if_possible
-
 import typing
 import collections
 
@@ -32,6 +30,36 @@ __all__ = ["MagicKeysView"]
 _K = TypeVar("_K")
 
 _T = TypeVar("_T")
+
+
+def _lower_items_reduced(obj: Iterable[_T]) -> Set[_T]:
+    reduced_set: Set[_T] = set()
+
+    for i in obj:
+        try:
+            i = i.lower()  # type: ignore
+
+        except AttributeError:  # pragma: no cover
+            continue
+
+        reduced_set.add(i)
+
+    return reduced_set
+
+
+def _lower_items_if_possible(obj: Iterable[_T]) -> Set[_T]:
+    reduced_set: Set[_T] = set()
+
+    for i in obj:
+        try:
+            i = i.lower()  # type: ignore
+
+        except AttributeError:  # pragma: no cover
+            pass
+
+        reduced_set.add(i)
+
+    return reduced_set
 
 
 class MagicKeysView(KeysView[_K], Reversible[_K], Generic[_K]):
@@ -141,16 +169,13 @@ class TolerantMagicKeysView(MagicKeysView[AnyStr], Generic[AnyStr]):
             return False
 
     def __and__(self, obj: Iterable[Any]) -> Set[AnyStr]:
-        return super().__and__(lower_items_reduced(obj))  # type: ignore
+        return super().__and__(_lower_items_reduced(obj))  # type: ignore
 
     def __or__(self, obj: Iterable[_T]) -> Set[Union[AnyStr, _T]]:
-        return super().__or__(lower_items_if_possible(obj))  # type: ignore
+        return super().__or__(_lower_items_if_possible(obj))  # type: ignore
 
     def __sub__(self, obj: Iterable[Any]) -> Set[AnyStr]:
-        return super().__sub__(lower_items_reduced(obj))  # type: ignore
+        return super().__sub__(_lower_items_reduced(obj))  # type: ignore
 
     def __xor__(self, obj: Iterable[_T]) -> Set[Union[AnyStr, _T]]:
-        return super().__xor__(lower_items_if_possible(obj))  # type: ignore
-
-    def __reversed__(self) -> Iterator[AnyStr]:
-        return super().__reversed__()  # type: ignore
+        return super().__xor__(_lower_items_if_possible(obj))  # type: ignore

@@ -17,22 +17,25 @@
 
 
 from typing import Mapping, MutableMapping, TypeVar, \
-    ItemsView, Generic, Iterator, Iterable, Tuple, Any, Optional, List, Set, \
+    Generic, Iterator, Iterable, Tuple, Any, Optional, List, \
     Union, Dict, Reversible, AnyStr
 
 from ._version import __version__  # noqa: F401
 from ._keys_view import MagicKeysView, TolerantMagicKeysView
 from ._values_view import MagicValuesView
+from ._items_view import MagicItemsView, TolerantMagicItemsView
 
 from . import _keys_view
 from . import _values_view
+from . import _items_view
 
 import threading
 import collections
 
 __all__ = [
     "__version__", "FrozenMagicDict", "MagicDict", "FrozenTolerantMagicDict",
-    "TolerantMagicDict"] + _keys_view.__all__ + _values_view.__all__
+    "TolerantMagicDict"] + _keys_view.__all__ + _values_view.__all__ + \
+        _items_view.__all__
 
 _K = TypeVar("_K")
 
@@ -46,61 +49,6 @@ class _Identifier:
 
 
 _DEFAULT_MARK = _Identifier()
-
-
-class _MagicItemsView(
-        Reversible[Tuple[_K, _V]], ItemsView[_K, _V], Generic[_K, _V]):
-    def __init__(self, map: Union["FrozenMagicDict", "MagicDict"]) -> None:
-        self._map = map
-
-    def __len__(self) -> int:
-        return len(self._map)
-
-    def __iter__(self) -> Iterator[Tuple[_K, _V]]:
-        for key, value in list(self._map._kv_pairs.values()):
-            yield (key, value)
-
-    def __contains__(self, pair: Any) -> bool:
-        return pair in self._map._kv_pairs.values()
-
-    def __eq__(self, obj: Any) -> bool:
-        return list(self) == list(obj)
-
-    def __ne__(self, obj: Any) -> bool:
-        return not self.__eq__(obj)
-
-    def __lt__(self, obj: Iterable[Any]) -> bool:
-        return set(self) < set(obj)
-
-    def __le__(self, obj: Iterable[Any]) -> bool:
-        return set(self) <= set(obj)
-
-    def __gt__(self, obj: Iterable[Any]) -> bool:
-        return set(self) > set(obj)
-
-    def __ge__(self, obj: Iterable[Any]) -> bool:
-        return set(self) >= set(obj)
-
-    def __and__(self, obj: Iterable[Any]) -> Set[Any]:
-        return set(self) & set(obj)
-
-    def __or__(self, obj: Iterable[Any]) -> Set[Any]:
-        return set(self) | set(obj)
-
-    def __sub__(self, obj: Iterable[Any]) -> Set[Any]:
-        return set(self) - set(obj)
-
-    def __xor__(self, obj: Iterable[Any]) -> Set[Any]:
-        return set(self) ^ set(obj)
-
-    def __reversed__(self) -> "_MagicItemsView[_K, _V]":  # type: ignore
-        return reversed(self._map).items()  # type: ignore
-
-    def __str__(self) -> str:
-        return "{}({})".format(
-            self.__class__.__name__, repr([item for item in self]))
-
-    __repr__ = __str__
 
 
 class FrozenMagicDict(Reversible[_K], Mapping[_K, _V], Generic[_K, _V]):
@@ -228,8 +176,8 @@ class FrozenMagicDict(Reversible[_K], Mapping[_K, _V], Generic[_K, _V]):
     def values(self) -> MagicValuesView[_V]:
         return MagicValuesView(self)
 
-    def items(self) -> _MagicItemsView[_K, _V]:
-        return _MagicItemsView(self)
+    def items(self) -> MagicItemsView[_K, _V]:
+        return MagicItemsView(self)
 
     get = get_first  # type: ignore
     __repr__ = __str__
@@ -395,58 +343,6 @@ class MagicDict(
         return self.__class__(self)
 
 
-class _TolerantMagicItemsView(
-        _MagicItemsView[AnyStr, _V], Generic[AnyStr, _V]):
-    def __contains__(self, pair: Any) -> bool:
-        try:
-            lower_pair = (pair[0].lower(), pair[1])
-
-        except AttributeError:  # pragma: no cover
-            return False
-
-        return super().__contains__(lower_pair)
-
-    def __eq__(self, obj: Any) -> bool:
-        if not isinstance(obj, collections.abc.Iterable):  # pragma: no cover
-            return False
-
-        try:
-            lower_obj = [(k.lower(), v) for k, v in iter(obj)]
-
-        except AttributeError:  # pragma: no cover
-            return False
-
-        return super().__eq__(lower_obj)
-
-    def __lt__(self, obj: Iterable[Any]) -> bool:
-        return super().__lt__([(k.lower(), v) for k, v in iter(obj)])
-
-    def __le__(self, obj: Iterable[Any]) -> bool:
-        return super().__le__([(k.lower(), v) for k, v in iter(obj)])
-
-    def __gt__(self, obj: Iterable[Any]) -> bool:
-        return super().__gt__([(k.lower(), v) for k, v in iter(obj)])
-
-    def __ge__(self, obj: Iterable[Any]) -> bool:
-        return super().__ge__([(k.lower(), v) for k, v in iter(obj)])
-
-    def __and__(self, obj: Iterable[Any]) -> Set[Any]:
-        return super().__and__([(k.lower(), v) for k, v in iter(obj)])
-
-    def __or__(self, obj: Iterable[Any]) -> Set[Any]:
-        return super().__or__([(k.lower(), v) for k, v in iter(obj)])
-
-    def __sub__(self, obj: Iterable[Any]) -> Set[Any]:
-        return super().__sub__([(k.lower(), v) for k, v in iter(obj)])
-
-    def __xor__(self, obj: Iterable[Any]) -> Set[Any]:
-        return super().__xor__([(k.lower(), v) for k, v in iter(obj)])
-
-    def __reversed__(  # type: ignore
-            self) -> "_TolerantMagicItemsView[AnyStr, _V]":
-        return reversed(self._map).items()  # type: ignore
-
-
 class FrozenTolerantMagicDict(
         FrozenMagicDict[AnyStr, _V], Generic[AnyStr, _V]):
     """
@@ -515,8 +411,8 @@ class FrozenTolerantMagicDict(
     def keys(self) -> MagicKeysView[AnyStr]:
         return TolerantMagicKeysView(self)
 
-    def items(self) -> _TolerantMagicItemsView[AnyStr, _V]:
-        return _TolerantMagicItemsView(self)
+    def items(self) -> TolerantMagicItemsView[AnyStr, _V]:
+        return TolerantMagicItemsView(self)
 
     get = get_first  # type: ignore
 
