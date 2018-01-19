@@ -7,3 +7,4 @@ recursive-include tests *
 global-exclude *.pyo
 global-exclude *.pyc
 exclude ./_modify_version.py
+include *requirements.txt
