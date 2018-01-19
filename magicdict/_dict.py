@@ -43,6 +43,8 @@ class MagicDict(
     """
     A mutable version of `FrozenMagicDict`.
     """
+    __slots__ = ("_lock",)
+
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         self._lock = threading.Lock()
 

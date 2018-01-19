@@ -35,6 +35,8 @@ _T = TypeVar("_T")
 
 class MagicItemsView(
         Reversible[Tuple[_K, _V]], ItemsView[_K, _V], Generic[_K, _V]):
+    __slots__ = ("_map",)
+
     def __init__(self, __map: "FrozenMagicDict[_K, _V]") -> None:
         self._map = __map
 

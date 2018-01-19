@@ -30,6 +30,8 @@ _T = TypeVar("_T")
 
 
 class MagicValuesView(ValuesView[_V], Generic[_V]):
+    __slots__ = ("_map",)
+
     def __init__(self, __map: "FrozenMagicDict[Any, _V]") -> None:
         self._map = __map
 

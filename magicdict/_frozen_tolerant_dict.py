@@ -30,6 +30,8 @@ class FrozenTolerantMagicDict(
     `FrozenTolerantMagicDict` has exactly the same functionality as
     `FrozenMagicDict`. However, the keys are case-insensitive.
     """
+    __slots__ = ()
+
     @staticmethod
     def _alter_key(key: AnyStr) -> AnyStr:
         return key.lower()

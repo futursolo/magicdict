@@ -58,6 +58,10 @@ class FrozenMagicDict(Reversible[_K], Mapping[_K, _V], Generic[_K, _V]):
             **kwargs: _V) -> None:  # pragma: no cover
         ...
 
+    __slots__ = (
+        "_next_index", "_first_values", "_pair_ids", "_kv_pairs",
+        "_last_values")
+
     @typing.overload  # noqa: F811
     def __init__(
         self, __iterable: Iterable[Tuple[_K, _V]],

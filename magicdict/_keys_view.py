@@ -33,6 +33,8 @@ _T = TypeVar("_T")
 
 
 class MagicKeysView(KeysView[_K], Reversible[_K], Generic[_K]):
+    __slots__ = ("_map",)
+
     def __init__(self, __map: "FrozenMagicDict[_K, Any]") -> None:
         self._map = __map
 

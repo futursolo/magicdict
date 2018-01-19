@@ -32,4 +32,4 @@ class TolerantMagicDict(
     `TolerantMagicDict` has exactly the same functionality as
     `MagicDict`. However, the keys are case-insensitive.
     """
-    pass
+    __slots__ = ()
