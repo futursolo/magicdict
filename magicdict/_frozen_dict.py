@@ -124,6 +124,14 @@ class FrozenMagicDict(Reversible[_K], Mapping[_K, _V], Generic[_K, _V]):
         self._kv_pairs[index] = (key, value)
         self._last_values[key] = value
 
+    def _has_value(self, value: Any) -> bool:
+        for _, _value in self._kv_pairs.values():
+            if _value == value:
+                return True
+
+        else:
+            return False
+
     def __getitem__(self, key: _K) -> _V:
         key = self._alter_key(key)
 
@@ -195,10 +203,14 @@ class FrozenMagicDict(Reversible[_K], Mapping[_K, _V], Generic[_K, _V]):
         """
         key = self._alter_key(key)
 
-        for index in self._pair_ids.get(key, []):
-            _, value = self._kv_pairs[index]
+        try:
+            for index in self._pair_ids.get(key, []):
+                _, value = self._kv_pairs[index]
 
-            yield value
+                yield value
+
+        except KeyError as e:  # pragma: no cover
+            raise RuntimeError("Dictionary modified during iteration.") from e
 
     def get_list(self, key: _K) -> List[_V]:
         """

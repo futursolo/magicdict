@@ -54,6 +54,14 @@ class MagicDict(
         with self._lock:
             super()._add_one(key, value)
 
+    def _has_value(self, value: Any) -> bool:
+        with self._lock:
+            return super()._has_value(value)
+
+    def __eq__(self, obj: Any) -> bool:
+        with self._lock:
+            return super().__eq__(obj)
+
     def __setitem__(self, key: _K, value: _V) -> None:
         key = self._alter_key(key)
 

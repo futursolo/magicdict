@@ -42,12 +42,7 @@ class MagicValuesView(ValuesView[_V], Generic[_V]):
             yield value
 
     def __contains__(self, value: Any) -> bool:
-        for _, _value in self._map._kv_pairs.values():
-            if _value == value:
-                return True
-
-        else:
-            return False
+        return self._map._has_value(value)
 
     def __reversed__(self) -> Iterator[_V]:
         for _, value in reversed(self._map._kv_pairs.values()):  # type: ignore

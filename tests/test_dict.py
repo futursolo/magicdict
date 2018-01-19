@@ -38,7 +38,7 @@ class MagicDictTestCase:
         dic["a"] = "d"
 
         assert dic["a"] == "d"
-        assert len(dic) == 1
+        assert dic == {"a": "d"}
 
     def test_method_delitem(self):
         dic = MagicDict([("a", "b"), ("a", "c")])

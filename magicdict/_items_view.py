@@ -74,8 +74,7 @@ class MagicItemsView(
         return reduced_set
 
     def __iter__(self) -> Iterator[Tuple[_K, _V]]:
-        for key, value in list(self._map._kv_pairs.values()):
-            yield (key, value)
+        yield from self._map._kv_pairs.values()
 
     def __contains__(self, pair: Any) -> bool:
         try:
@@ -142,6 +141,4 @@ class MagicItemsView(
         return super().__xor__(self._maybe_alter_keys(obj))
 
     def __reversed__(self) -> Iterator[Tuple[_K, _V]]:
-        for key, value in reversed(  # type: ignore
-                self._map._kv_pairs.values()):
-            yield (key, value)
+        yield from reversed(self._map._kv_pairs.values())  # type: ignore
