@@ -18,40 +18,39 @@
 from magicdict import FrozenMagicDict, FrozenTolerantMagicDict
 
 
-class MagicKeysViewTestCase:
+class MagicItemsViewTestCase:
     def test_method_len(self):
         sample = [("a", "b"), ("c", "d"), ("c", "d"), ("e", "f")]
         dic = FrozenMagicDict(sample)
 
-        assert len(dic.keys()) == 4
+        assert len(dic.items()) == 4
 
     def test_method_iter(self):
         sample = [("a", "b"), ("c", "d"), ("c", "d"), ("e", "f")]
         dic = FrozenMagicDict(sample)
 
-        assert list(iter(dic.keys())) == ["a", "c", "c", "e"]
+        assert list(iter(dic.items())) == sample
 
     def test_method_contains(self):
         sample = [("a", "b"), ("c", "d"), ("c", "d"), ("e", "f")]
         dic = FrozenMagicDict(sample)
 
-        assert "a" in dic.keys()
-        assert "d" not in dic.keys()
+        assert ("a", "b") in dic.items()
+        assert ("b", "b") not in dic.items()
 
     def test_method_eq_ne(self):
         sample = [("a", "b"), ("c", "d"), ("c", "d"), ("e", "f")]
         dic = FrozenMagicDict(sample)
 
-        assert dic.keys() == [k for k, _ in sample]
+        assert dic.items() == sample
 
-        assert dic.keys() != []
+        assert dic.items() != []
 
     def test_method_reversed(self):
         sample = [("a", "b"), ("c", "d"), ("c", "d"), ("e", "f")]
         dic = FrozenMagicDict(sample)
 
-        assert list(reversed(dic.keys())) == \
-            list(reversed([k for k, _ in sample]))
+        assert list(reversed(dic.items())) == list(reversed(sample))
 
     def test_method_lt(self):
         sample = [("a", "b"), ("c", "d")]
@@ -60,7 +59,7 @@ class MagicKeysViewTestCase:
         sample2 = [("a", "b"), ("c", "d"), ("e", "f")]
         dic2 = FrozenMagicDict(sample2)
 
-        assert dic.keys() <= dic2.keys()
+        assert dic.items() <= dic2.items()
 
     def test_method_le(self):
         sample = [("a", "b"), ("c", "d")]
@@ -69,7 +68,7 @@ class MagicKeysViewTestCase:
         sample2 = [("a", "b"), ("c", "d"), ("e", "f")]
         dic2 = FrozenMagicDict(sample2)
 
-        assert dic.keys() < dic2.keys()
+        assert dic.items() < dic2.items()
 
     def test_method_gt(self):
         sample = [("a", "b"), ("c", "d"), ("e", "f")]
@@ -78,7 +77,7 @@ class MagicKeysViewTestCase:
         sample2 = [("a", "b"), ("c", "d")]
         dic2 = FrozenMagicDict(sample2)
 
-        assert dic.keys() > dic2.keys()
+        assert dic.items() > dic2.items()
 
     def test_method_ge(self):
         sample = [("a", "b"), ("c", "d"), ("e", "f")]
@@ -87,7 +86,7 @@ class MagicKeysViewTestCase:
         sample2 = [("a", "b"), ("c", "d")]
         dic2 = FrozenMagicDict(sample2)
 
-        assert dic.keys() >= dic2.keys()
+        assert dic.items() >= dic2.items()
 
     def test_method_and(self):
         sample = [("a", "b"), ("c", "d"), ("e", "f")]
@@ -96,7 +95,7 @@ class MagicKeysViewTestCase:
         sample2 = [("a", "b"), ("c", "d")]
         dic2 = FrozenMagicDict(sample2)
 
-        assert dic.keys() & dic2.keys() == set(["a", "c"])
+        assert dic.items() & dic2.items() == set([("a", "b"), ("c", "d")])
 
     def test_method_or(self):
         sample = [("c", "d"), ("e", "f")]
@@ -105,7 +104,8 @@ class MagicKeysViewTestCase:
         sample2 = [("a", "b"), ("c", "d")]
         dic2 = FrozenMagicDict(sample2)
 
-        assert dic.keys() | dic2.keys() == set(["a", "c", "e"])
+        assert dic.items() | dic2.items() == set(
+            [("a", "b"), ("c", "d"), ("e", "f")])
 
     def test_method_sub(self):
         sample = [("a", "b"), ("c", "d"), ("e", "f")]
@@ -114,7 +114,7 @@ class MagicKeysViewTestCase:
         sample2 = [("a", "b"), ("c", "d")]
         dic2 = FrozenMagicDict(sample2)
 
-        assert dic.keys() - dic2.keys() == set(["e"])
+        assert dic.items() - dic2.items() == set([("e", "f")])
 
     def test_method_xor(self):
         sample = [("a", "b"), ("c", "d"), ("e", "f")]
@@ -123,55 +123,49 @@ class MagicKeysViewTestCase:
         sample2 = [("a", "b"), ("c", "d")]
         dic2 = FrozenMagicDict(sample2)
 
-        assert dic.keys() ^ dic2.keys() == set(["e"])
-
-    def test_method_str(self):
-        dic = FrozenMagicDict([("a", "b")])
-
-        assert str(dic.keys()) == "MagicKeysView(['a'])"
+        assert dic.items() ^ dic2.items() == set([("e", "f")])
 
 
-class TolerantMagicKeysViewTestCase:
+class TolerantMagicItemsViewTestCase:
     def test_method_contains(self):
         sample = [("A", "b"), ("c", "d"), ("c", "d"), ("e", "f")]
         dic = FrozenTolerantMagicDict(sample)
 
-        assert "a" in dic.keys()
-        assert "A" in dic.keys()
-        assert "d" not in dic.keys()
+        assert ("a", "b") in dic.items()
+        assert ("B", "b") not in dic.items()
 
     def test_method_eq_ne(self):
-        sample = [("A", "b"), ("c", "d"), ("c", "d"), ("e", "f")]
+        sample = [("A", "b"), ("C", "d"), ("c", "d"), ("e", "f")]
         dic = FrozenTolerantMagicDict(sample)
 
-        assert dic.keys() == [k.lower() for k, _ in sample]
+        assert dic.items() == [(k.upper(), v) for k, v in sample]
 
-        assert dic.keys() != []
+        assert dic.items() != []
 
     def test_method_reversed(self):
-        sample = [("A", "b"), ("c", "d"), ("C", "d"), ("e", "f")]
+        sample = [("a", "b"), ("C", "d"), ("c", "d"), ("E", "f")]
         dic = FrozenTolerantMagicDict(sample)
 
-        assert list(reversed(dic.keys())) == \
-            list(reversed([k.lower() for k, _ in sample]))
+        assert list(reversed(dic.items())) == \
+            list(reversed([(k.lower(), v) for k, v in sample]))
 
     def test_method_lt(self):
-        sample = [("a", "b"), ("c", "d")]
+        sample = [("a", "b"), ("C", "d")]
         dic = FrozenTolerantMagicDict(sample)
 
-        sample2 = [("A", "b"), ("c", "d"), ("e", "f")]
+        sample2 = [("a", "b"), ("c", "d"), ("e", "f")]
         dic2 = FrozenTolerantMagicDict(sample2)
 
-        assert dic.keys() <= dic2.keys()
+        assert dic.items() <= dic2.items()
 
     def test_method_le(self):
         sample = [("a", "b"), ("c", "d")]
         dic = FrozenTolerantMagicDict(sample)
 
-        sample2 = [("A", "b"), ("c", "d"), ("e", "f")]
+        sample2 = [("a", "b"), ("C", "d"), ("e", "f")]
         dic2 = FrozenTolerantMagicDict(sample2)
 
-        assert dic.keys() < dic2.keys()
+        assert dic.items() < dic2.items()
 
     def test_method_gt(self):
         sample = [("a", "b"), ("c", "d"), ("e", "f")]
@@ -180,16 +174,16 @@ class TolerantMagicKeysViewTestCase:
         sample2 = [("A", "b"), ("c", "d")]
         dic2 = FrozenTolerantMagicDict(sample2)
 
-        assert dic.keys() > dic2.keys()
+        assert dic.items() > dic2.items()
 
     def test_method_ge(self):
-        sample = [("a", "b"), ("c", "d"), ("e", "f")]
+        sample = [("a", "b"), ("c", "d"), ("E", "f")]
         dic = FrozenTolerantMagicDict(sample)
 
         sample2 = [("a", "b"), ("c", "d")]
         dic2 = FrozenTolerantMagicDict(sample2)
 
-        assert dic.keys() >= dic2.keys()
+        assert dic.items() >= dic2.items()
 
     def test_method_and(self):
         sample = [("a", "b"), ("C", "d"), ("e", "f")]
@@ -198,31 +192,32 @@ class TolerantMagicKeysViewTestCase:
         sample2 = [("a", "b"), ("c", "d")]
         dic2 = FrozenTolerantMagicDict(sample2)
 
-        assert dic.keys() & dic2.keys() == set(["a", "c"])
+        assert dic.items() & dic2.items() == set([("a", "b"), ("c", "d")])
 
     def test_method_or(self):
-        sample = [("c", "d"), ("e", "f")]
+        sample = [("c", "d"), ("E", "f")]
         dic = FrozenTolerantMagicDict(sample)
 
         sample2 = [("a", "b"), ("C", "d")]
         dic2 = FrozenTolerantMagicDict(sample2)
 
-        assert dic.keys() | dic2.keys() == set(["a", "c", "e"])
+        assert dic.items() | dic2.items() == set(
+            [("a", "b"), ("c", "d"), ("e", "f")])
 
     def test_method_sub(self):
         sample = [("a", "b"), ("c", "d"), ("e", "f")]
         dic = FrozenTolerantMagicDict(sample)
 
-        sample2 = [("a", "b"), ("C", "d")]
+        sample2 = [("a", "b"), ("c", "d")]
         dic2 = FrozenTolerantMagicDict(sample2)
 
-        assert dic.keys() - dic2.keys() == set(["e"])
+        assert dic.items() - dic2.items() == set([("e", "f")])
 
     def test_method_xor(self):
         sample = [("a", "b"), ("c", "d"), ("e", "f")]
         dic = FrozenTolerantMagicDict(sample)
 
-        sample2 = [("A", "b"), ("c", "d")]
+        sample2 = [("a", "b"), ("c", "d")]
         dic2 = FrozenTolerantMagicDict(sample2)
 
-        assert dic.keys() ^ dic2.keys() == set(["e"])
+        assert dic.items() ^ dic2.items() == set([("e", "f")])

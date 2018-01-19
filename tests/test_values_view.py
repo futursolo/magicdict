@@ -38,22 +38,9 @@ class MagicValuesViewTestCase:
         assert "b" in dic.values()
         assert "g" not in dic.values()
 
-    def test_method_eq_ne(self):
-        sample = [("a", "b"), ("c", "d"), ("c", "d"), ("e", "f")]
-        dic = FrozenMagicDict(sample)
-
-        assert dic.values() == [v for _, v in sample]
-
-        assert dic.values() != []
-
     def test_method_reversed(self):
         sample = [("a", "b"), ("c", "d"), ("c", "d"), ("e", "f")]
         dic = FrozenMagicDict(sample)
 
         assert list(reversed(dic.values())) == \
             list(reversed([v for _, v in sample]))
-
-    def test_method_str(self):
-        dic = FrozenMagicDict([("a", "b")])
-
-        assert str(dic.values()) == "MagicValuesView(['b'])"

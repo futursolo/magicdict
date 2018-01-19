@@ -25,7 +25,7 @@ class TolerantMagicDictTestCase:
         sample = [("a", "b"), ("c", "d"), ("c", "d"), ("e", "f")]
         dic = TolerantMagicDict(sample)
 
-        assert dic.items() == [(k.upper(), v) for k, v in sample]
+        assert dic.items() == [(k.lower(), v) for k, v in sample]
 
     def test_method_getitem(self):
         dic = TolerantMagicDict([("a", "b"), ("a", "c")])

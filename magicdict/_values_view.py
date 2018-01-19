@@ -18,10 +18,9 @@
 from typing import ValuesView, Generic, Iterator, Any, TypeVar
 
 import typing
-import collections
 
 if typing.TYPE_CHECKING:  # pragma: no cover
-    from .__init__ import FrozenMagicDict  # noqa: F401
+    from ._frozen_dict import FrozenMagicDict  # noqa: F401
 
 __all__ = ["MagicValuesView"]
 
@@ -34,8 +33,7 @@ class MagicValuesView(ValuesView[_V], Generic[_V]):
     def __init__(self, __map: "FrozenMagicDict[Any, _V]") -> None:
         self._map = __map
 
-    def __len__(self) -> int:
-        return len(self._map)
+        super().__init__(self._map)  # type: ignore
 
     def __iter__(self) -> Iterator[_V]:
         for _, value in self._map._kv_pairs.values():
@@ -49,21 +47,6 @@ class MagicValuesView(ValuesView[_V], Generic[_V]):
         else:
             return False
 
-    def __eq__(self, obj: Any) -> bool:
-        if not isinstance(obj, collections.abc.Iterable):  # pragma: no cover
-            return False
-
-        return list(self) == list(obj)
-
-    def __ne__(self, obj: Any) -> bool:
-        return not self.__eq__(obj)
-
     def __reversed__(self) -> Iterator[_V]:
-        for _, value in reversed(self._map._kv_pairs.values()):
+        for _, value in reversed(self._map._kv_pairs.values()):  # type: ignore
             yield value
-
-    def __str__(self) -> str:
-        return "{}({})".format(
-            self.__class__.__name__, repr([item for item in self]))
-
-    __repr__ = __str__

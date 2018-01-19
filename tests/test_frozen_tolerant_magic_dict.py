@@ -18,18 +18,19 @@
 from magicdict import FrozenTolerantMagicDict
 
 
-class FrozenMagicDictTestCase:
+class FrozenTolerantMagicDictTestCase:
     def test_init_with_iter(self):
         sample = [("A", "b"), ("c", "d"), ("c", "d"), ("e", "f")]
         dic = FrozenTolerantMagicDict(sample)
 
-        assert dic.items() == [(k.upper(), v) for k, v in sample]
+        assert list(dic.items()) == [(k.lower(), v) for k, v in sample]
 
     def test_init_with_mapping(self):
         sample = {"A": "b", "c": "d", "e": "f"}
         dic = FrozenTolerantMagicDict(sample)
 
-        assert dic.items() == sample.items()
+        assert list(dic.items()) == \
+            list({"a": "b", "c": "d", "e": "f"}.items())
 
     def test_init_with_kwargs(self):
         sample = {"a": "b", "c": "d", "e": "f"}

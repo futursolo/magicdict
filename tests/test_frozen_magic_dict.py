@@ -62,14 +62,15 @@ class FrozenMagicDictTestCase:
         assert "d" not in dic
 
     def test_method_eq_ne(self):
-        sample = [("a", "b"), ("c", "d"), ("c", "d"), ("e", "f")]
-        dic = FrozenMagicDict(sample)
+        sample_dic = FrozenMagicDict(
+            [("a", "b"), ("c", "d"), ("c", "d"), ("e", "f")])
+        dic = FrozenMagicDict(sample_dic)
 
-        assert dic == sample
+        assert dic == sample_dic
 
-        sample.append(("f", "g"))
+        sample_ne = FrozenMagicDict(sample_dic, f="g")
 
-        assert dic != sample
+        assert dic != sample_ne
         assert dic != 123
 
     def test_method_str(self):
@@ -78,10 +79,11 @@ class FrozenMagicDictTestCase:
         assert str(dic) == "FrozenMagicDict([('a', 'b')])"
 
     def test_method_reversed(self):
-        sample = [("a", "b"), ("c", "d"), ("c", "d"), ("e", "f")]
+        sample = FrozenMagicDict(
+            [("a", "b"), ("c", "d"), ("c", "d"), ("e", "f")])
         dic = FrozenMagicDict(sample)
 
-        assert reversed(dic) == reversed(sample)
+        assert list(reversed(dic)) == list(reversed(sample))
 
     def test_get_first(self):
         dic = FrozenMagicDict([("a", "b"), ("a", "d"), ("a", "f")])

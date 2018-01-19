@@ -17,13 +17,13 @@
 
 from typing import \
     Iterator, KeysView, Generic, Union, Iterable, Set, Any, Reversible, \
-    AnyStr, TypeVar
+    TypeVar, AbstractSet
 
 import typing
 import collections
 
 if typing.TYPE_CHECKING:  # pragma: no cover
-    from .__init__ import FrozenMagicDict  # noqa: F401
+    from ._frozen_dict import FrozenMagicDict  # noqa: F401
 
 __all__ = ["MagicKeysView"]
 
@@ -32,150 +32,95 @@ _K = TypeVar("_K")
 _T = TypeVar("_T")
 
 
-def _lower_items_reduced(obj: Iterable[_T]) -> Set[_T]:
-    reduced_set: Set[_T] = set()
-
-    for i in obj:
-        try:
-            i = i.lower()  # type: ignore
-
-        except AttributeError:  # pragma: no cover
-            continue
-
-        reduced_set.add(i)
-
-    return reduced_set
-
-
-def _lower_items_if_possible(obj: Iterable[_T]) -> Set[_T]:
-    reduced_set: Set[_T] = set()
-
-    for i in obj:
-        try:
-            i = i.lower()  # type: ignore
-
-        except AttributeError:  # pragma: no cover
-            pass
-
-        reduced_set.add(i)
-
-    return reduced_set
-
-
 class MagicKeysView(KeysView[_K], Reversible[_K], Generic[_K]):
     def __init__(self, __map: "FrozenMagicDict[_K, Any]") -> None:
         self._map = __map
 
-    def __len__(self) -> int:
-        return len(self._map)
+        super().__init__(self._map)  # type: ignore
 
-    def __iter__(self) -> Iterator[_K]:
-        for key, _ in self._map._kv_pairs.values():
-            yield key
+    def _alter_keys_reduced(self, obj: Iterable[_T]) -> Set[_T]:
+        reduced_set: Set[_T] = set()
+
+        for i in obj:
+            try:
+                i = self._map._alter_key(i)  # type: ignore
+
+            except (AttributeError, TypeError):  # pragma: no cover
+                continue
+
+            reduced_set.add(i)
+
+        return reduced_set
+
+    def _maybe_alter_keys(self, obj: Iterable[_T]) -> Set[_T]:
+        reduced_set: Set[_T] = set()
+
+        for i in obj:
+            try:
+                i = self._map._maybe_alter_key(i)
+
+            except (AttributeError, TypeError):  # pragma: no cover
+                pass
+
+            reduced_set.add(i)
+
+        return reduced_set
 
     def __contains__(self, key: Any) -> bool:
-        return key in self._map._pair_ids.keys()
+        return self._map._maybe_alter_key(key) in self._map._pair_ids.keys()
 
     def __eq__(self, obj: Any) -> bool:
         if not isinstance(obj, collections.abc.Iterable):  # pragma: no cover
             return False
 
-        return list(self) == list(obj)
+        try:
+            self_iter = iter(self)
+            for val in obj:
+                key = next(self_iter)
+
+                if key != self._map._maybe_alter_key(val):
+                    return False
+
+            else:
+                try:
+                    next(self_iter)
+
+                except StopIteration:
+                    return True
+
+                else:
+                    return False
+
+        except (AttributeError, TypeError, StopIteration):  # pragma: no cover
+            return False
 
     def __ne__(self, obj: Any) -> bool:
         return not self.__eq__(obj)
 
     def __lt__(self, obj: Iterable[Any]) -> bool:
-        return set(self) < set(obj)
+        return super().__lt__(self._maybe_alter_keys(obj))
 
     def __le__(self, obj: Iterable[Any]) -> bool:
-        return set(self) <= set(obj)
+        return super().__le__(self._maybe_alter_keys(obj))
 
     def __gt__(self, obj: Iterable[Any]) -> bool:
-        return set(self) > set(obj)
+        return super().__gt__(self._maybe_alter_keys(obj))
 
     def __ge__(self, obj: Iterable[Any]) -> bool:
-        return set(self) >= set(obj)
+        return super().__ge__(self._maybe_alter_keys(obj))
 
-    def __and__(self, obj: Iterable[Any]) -> Set[_K]:
-        return set(self) & set(obj)
+    def __and__(self, obj: Iterable[Any]) -> AbstractSet[_K]:
+        return super().__and__(self._alter_keys_reduced(obj))
 
-    def __or__(self, obj: Iterable[_T]) -> Set[Union[_K, _T]]:
-        return set(self) | set(obj)
+    def __or__(self, obj: Iterable[_T]) -> AbstractSet[Union[_K, _T]]:
+        return super().__or__(self._maybe_alter_keys(obj))
 
-    def __sub__(self, obj: Iterable[Any]) -> Set[_K]:
-        return set(self) - set(obj)
+    def __sub__(self, obj: Iterable[Any]) -> AbstractSet[_K]:
+        return super().__sub__(self._alter_keys_reduced(obj))
 
-    def __xor__(self, obj: Iterable[_T]) -> Set[Union[_K, _T]]:
-        return set(self) ^ set(obj)
+    def __xor__(self, obj: Iterable[_T]) -> AbstractSet[Union[_K, _T]]:
+        return super().__xor__(self._maybe_alter_keys(obj))
 
     def __reversed__(self) -> Iterator[_K]:
-        for key, _ in reversed(self._map._kv_pairs.values()):
+        for key, _ in reversed(self._map._kv_pairs.values()):  # type: ignore
             yield key
-
-    def __str__(self) -> str:
-        return "{}({})".format(
-            self.__class__.__name__, repr([item for item in self]))
-
-    __repr__ = __str__
-
-
-class TolerantMagicKeysView(MagicKeysView[AnyStr], Generic[AnyStr]):
-    def __contains__(self, key: Any) -> bool:
-        try:
-            return super().__contains__(key.lower())
-
-        except AttributeError:  # pragma: no cover
-            return False
-
-    def __eq__(self, obj: Any) -> bool:
-        if not isinstance(obj, collections.abc.Iterable):  # pragma: no cover
-            return False
-
-        try:
-            lower_obj = [item.lower() for item in iter(obj)]
-
-        except (AttributeError, TypeError):  # pragma: no cover
-            return False
-
-        return super().__eq__(lower_obj)
-
-    def __lt__(self, obj: Iterable[Any]) -> bool:
-        try:
-            return super().__lt__([item.lower() for item in iter(obj)])
-
-        except (AttributeError, TypeError):  # pragma: no cover
-            return False
-
-    def __le__(self, obj: Iterable[Any]) -> bool:
-        try:
-            return super().__le__([item.lower() for item in iter(obj)])
-
-        except (AttributeError, TypeError):  # pragma: no cover
-            return False
-
-    def __gt__(self, obj: Iterable[Any]) -> bool:
-        try:
-            return super().__gt__([item.lower() for item in iter(obj)])
-
-        except (AttributeError, TypeError):  # pragma: no cover
-            return False
-
-    def __ge__(self, obj: Iterable[Any]) -> bool:
-        try:
-            return super().__ge__([item.lower() for item in iter(obj)])
-
-        except (AttributeError, TypeError):  # pragma: no cover
-            return False
-
-    def __and__(self, obj: Iterable[Any]) -> Set[AnyStr]:
-        return super().__and__(_lower_items_reduced(obj))  # type: ignore
-
-    def __or__(self, obj: Iterable[_T]) -> Set[Union[AnyStr, _T]]:
-        return super().__or__(_lower_items_if_possible(obj))  # type: ignore
-
-    def __sub__(self, obj: Iterable[Any]) -> Set[AnyStr]:
-        return super().__sub__(_lower_items_reduced(obj))  # type: ignore
-
-    def __xor__(self, obj: Iterable[_T]) -> Set[Union[AnyStr, _T]]:
-        return super().__xor__(_lower_items_if_possible(obj))  # type: ignore
