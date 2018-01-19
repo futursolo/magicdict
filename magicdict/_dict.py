@@ -174,8 +174,6 @@ class MagicDict(
 
             self._last_values.clear()
 
-            self._has_multi_values = False
-
     def setdefault(self, key: _K, default: _V=None) -> _V:
         try:
             return self[key]

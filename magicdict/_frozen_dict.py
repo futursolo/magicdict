@@ -49,17 +49,19 @@ class FrozenMagicDict(Reversible[_K], Mapping[_K, _V], Generic[_K, _V]):
         return key
 
     @typing.overload
-    def __init__(self, **kwargs: _V) -> None:
+    def __init__(self, **kwargs: _V) -> None:  # pragma: no cover
         ...
 
     @typing.overload  # noqa: F811
-    def __init__(self, __map: Mapping[_K, _V], **kwargs: _V) -> None:
+    def __init__(
+        self, __map: Mapping[_K, _V],
+            **kwargs: _V) -> None:  # pragma: no cover
         ...
 
     @typing.overload  # noqa: F811
     def __init__(
         self, __iterable: Iterable[Tuple[_K, _V]],
-            **kwargs: _V) -> None:
+            **kwargs: _V) -> None:  # pragma: no cover
         ...
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:  # noqa: F811
@@ -73,8 +75,6 @@ class FrozenMagicDict(Reversible[_K], Mapping[_K, _V], Generic[_K, _V]):
             collections.OrderedDict()
 
         self._last_values: Dict[_K, _V] = {}
-
-        self._has_multi_values = False
 
         if args:
             if len(args) > 1:  # pragma: no cover
@@ -116,7 +116,6 @@ class FrozenMagicDict(Reversible[_K], Mapping[_K, _V], Generic[_K, _V]):
 
         else:
             self._pair_ids[key].append(index)
-            self._has_multi_values = True
 
         self._kv_pairs[index] = (key, value)
         self._last_values[key] = value
@@ -139,13 +138,6 @@ class FrozenMagicDict(Reversible[_K], Mapping[_K, _V], Generic[_K, _V]):
         return key in self._first_values
 
     def __eq__(self, obj: Any) -> bool:
-        if isinstance(obj, FrozenMagicDict):
-            return list(self._kv_pairs.values()) == \
-                list(obj._kv_pairs.values())
-
-        if self._has_multi_values:
-            return False
-
         if isinstance(obj, collections.abc.Mapping):
             return self.items() == obj.items()
 

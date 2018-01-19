@@ -68,7 +68,7 @@ class FrozenMagicDictTestCase:
 
         assert dic == sample_dic
 
-        sample_ne = FrozenMagicDict(sample_dic, f="g")
+        sample_ne = dict(sample_dic, f="g")
 
         assert dic != sample_ne
         assert dic != 123

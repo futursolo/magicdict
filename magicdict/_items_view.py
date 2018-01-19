@@ -107,7 +107,7 @@ class MagicItemsView(
                 else:
                     return False
 
-        except (AttributeError, TypeError, StopIteration):  # pragma: no cover
+        except (AttributeError, ValueError, TypeError, StopIteration):
             return False
 
     def __ne__(self, obj: Any) -> bool:

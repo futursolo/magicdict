@@ -70,13 +70,15 @@ class MagicDictTestCase:
         assert dic.get_list("a") == ["b", "c"]
 
     def test_pop(self):
-        dic = MagicDict([("a", "b")])
+        dic = MagicDict([("a", "b"), ("a", "c")])
 
-        assert len(dic) == 1
+        assert len(dic) == 2
 
         with pytest.raises(KeyError):
             dic.pop("d")
         assert dic.pop("d", "e") == "e"
+
+        assert dic.pop("a", "e") == "c"
 
         assert dic.pop("a", "e") == "b"
         assert len(dic) == 0

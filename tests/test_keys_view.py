@@ -46,6 +46,10 @@ class MagicKeysViewTestCase:
 
         assert dic.keys() != []
 
+        assert dic.keys() != ["a"]
+
+        assert dic.keys() != [1]
+
     def test_method_reversed(self):
         sample = [("a", "b"), ("c", "d"), ("c", "d"), ("e", "f")]
         dic = FrozenMagicDict(sample)
