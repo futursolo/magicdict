@@ -15,7 +15,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from typing import TypeVar, AnyStr, Generic
+from typing import TypeVar, AnyStr, Generic, Tuple
 
 from ._dict import MagicDict
 from ._frozen_tolerant_dict import FrozenTolerantMagicDict
@@ -25,11 +25,11 @@ __all__ = ["TolerantMagicDict"]
 _V = TypeVar("_V")
 
 
-class TolerantMagicDict(
+class TolerantMagicDict(  # type: ignore
     MagicDict[AnyStr, _V], FrozenTolerantMagicDict[AnyStr, _V],
         Generic[AnyStr, _V]):
     """
     `TolerantMagicDict` has exactly the same functionality as
     `MagicDict`. However, the keys are case-insensitive.
     """
-    __slots__ = ()
+    __slots__: Tuple[str, ...] = ()

@@ -40,6 +40,10 @@ class FrozenMagicDict(Reversible[_K], Mapping[_K, _V], Generic[_K, _V]):
     """
     An immutable ordered, one-to-many Mapping.
     """
+    __slots__ = (
+        "_next_index", "_first_values", "_pair_ids", "_kv_pairs",
+        "_last_values")
+
     @staticmethod
     def _alter_key(key: _K) -> _K:
         return key
@@ -57,10 +61,6 @@ class FrozenMagicDict(Reversible[_K], Mapping[_K, _V], Generic[_K, _V]):
         self, __map: Mapping[_K, _V],
             **kwargs: _V) -> None:  # pragma: no cover
         ...
-
-    __slots__ = (
-        "_next_index", "_first_values", "_pair_ids", "_kv_pairs",
-        "_last_values")
 
     @typing.overload  # noqa: F811
     def __init__(
