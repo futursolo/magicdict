@@ -81,7 +81,7 @@ class MagicDict(
 
     def add(self, key: _K, value: _V) -> None:
         """
-        Add a value corresponding to the key without removing the former one.
+        Add a value corresponding to the key without removing the existing one.
         """
         self._add_one(key, value)
 
@@ -117,11 +117,6 @@ class MagicDict(
                 return default  # type: ignore
 
     def popitem(self, last: bool=True) -> Tuple[_K, _V]:
-        """
-        This method behaves exactly like `collections.OrderedDict.popitem`.
-
-        If `last` is `True` then the items will popped by LIFO, else FIFO.
-        """
         with self._lock:
             index, pair = self._kv_pairs.popitem(last)
 

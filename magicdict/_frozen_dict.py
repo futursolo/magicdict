@@ -162,8 +162,9 @@ class FrozenMagicDict(Reversible[_K], Mapping[_K, _V], Generic[_K, _V]):
     def get_first(self, key: _K, default: Optional[_T]=None) -> \
             Optional[Union[_V, _T]]:
         """
-        Get the first item matching the key.
-        If not present, return the default.
+        Return the first value for key if key is in the dictionary,
+        else default. If default is not given, it defaults to `None`,
+        so that this method never raises a `KeyError`.
         """
         key = self._alter_key(key)
 
@@ -176,8 +177,9 @@ class FrozenMagicDict(Reversible[_K], Mapping[_K, _V], Generic[_K, _V]):
     def get_last(self, key: _K, default: Optional[_V]=None) -> \
             Optional[Union[_V, _T]]:
         """
-        Get the last item matching the key.
-        If not present, return the default.
+        Return the last value for key if key is in the dictionary,
+        else default. If default is not given, it defaults to `None`,
+        so that this method never raises a `KeyError`.
         """
         key = self._alter_key(key)
 

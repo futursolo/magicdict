@@ -42,6 +42,3 @@ class FrozenTolerantMagicDict(
             return key.lower()
 
         return key
-
-    def copy(self) -> "FrozenTolerantMagicDict[AnyStr, _V]":
-        return self.__class__(self)

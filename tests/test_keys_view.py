@@ -37,6 +37,7 @@ class MagicKeysViewTestCase:
 
         assert "a" in dic.keys()
         assert "d" not in dic.keys()
+        assert 123 not in dic.keys()
 
     def test_method_eq_ne(self):
         sample = [("a", "b"), ("c", "d"), ("c", "d"), ("e", "f")]
