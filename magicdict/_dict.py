@@ -62,7 +62,12 @@ class MagicDict(
 
             self._first_values[key] = value
 
-            self._pair_ids[key] = [index]
+            previous_indexes, self._pair_ids[key] = \
+                self._pair_ids.get(key, []), [index]
+
+            for index in previous_indexes:
+                del self._kv_pairs[index]
+
             self._kv_pairs[index] = (key, value)
 
             self._last_values[key] = value
