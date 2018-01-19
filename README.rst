@@ -8,32 +8,42 @@ magicdict
 
 An ordered, one-to-many mapping.
 
+Install
+-------
+
+.. code-block:: shell
+
+   $ pip install -U magicdict
+
+
 Thread Safety
 -------------
-`FrozenMagicDict` and its subclasses should be thread safe without additional
+:code:`FrozenMagicDict` and its subclasses should be thread safe without additional
 locking. If any data races occurred, then that's a bug. Please file an issue
 with reproducing procedure.
 
 Usage
 -----
-`MagicDict` should function like `collections.OrderedDict` except
-`move_to_end` is not defined and `d[key]` always returns the first
+:code:`MagicDict` should function like :code:`collections.OrderedDict` except
+:code:`move_to_end` is not defined and :code:`d[key]` always returns the first
 item.
 
-`FrozenMagicDict` is an immutable version of `MagicDict`.
+:code:`FrozenMagicDict` is an immutable version of :code:`MagicDict`.
 
-`FrozenTolerantMagicDict` and `TolerantMagicDict` are case-insensitive versions
-of `FrozenMagicDict` and `MagicDict` respectively.
+:code:`FrozenTolerantMagicDict` and :code:`TolerantMagicDict` are
+case-insensitive versions of :code:`FrozenMagicDict` and :code:`MagicDict`
+respectively.
 
-`get_first`, `get_last`, `get_iter`, and `get_list`:
+:code:`get_first`, :code:`get_last`, :code:`get_iter`, and :code:`get_list`:
 These methods are available in `FrozenMagicDict` and its subclasses.
 For more details, please read the comments of each method.
 
-`add`:
-Method `add` is available in `MagicDict` and `TolerantMagicDict`. This method
-is used as an substitution of `dic[key] = value` as it can append a value to the
+:code:`add`:
+Method :code:`add` is available in :code:`MagicDict` and
+:code:`TolerantMagicDict`. This method is used as an substitution of
+:code:`dic[key] = value` as it can append a value to the
 dictionary without removing the existing one. Setting values like normal
-`OrderedDict` will clear the stored value(s) if any.
+:code:`OrderedDict` will clear the stored value(s) if any.
 
 Contributing
 ------------
