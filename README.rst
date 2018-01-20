@@ -15,7 +15,6 @@ Install
 
    $ pip install -U magicdict
 
-
 Thread Safety
 -------------
 :code:`FrozenMagicDict` and its subclasses should be thread safe without additional
