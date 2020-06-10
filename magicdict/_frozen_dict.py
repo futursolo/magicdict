@@ -198,7 +198,7 @@ class FrozenMagicDict(Reversible[_K], Mapping[_K, _V], Generic[_K, _V]):
 
     def get(self, key: _K, default: Optional[_T] = None) -> \
             Optional[Union[_V, _T]]:
-        return self.get(key, default)
+        return self.get_first(key, default)
 
     @typing.overload
     def get_last(self, key: _K) -> Optional[_V]:
