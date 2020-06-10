@@ -22,18 +22,6 @@ import sys
 if not sys.version_info[:3] >= (3, 6, 0):
     raise RuntimeError("Magicdict requires Python 3.6.0 or higher.")
 
-else:
-    try:
-        import _modify_version
-
-    except ImportError:
-        pass
-
-    else:
-        _modify_version.modify("magicdict")
-
-    import _load_version
-
 
 setup_requires = [
     i for i in open("setup-requirements.txt").read().split("\n") if i]
@@ -48,9 +36,10 @@ tests_require = [
 if __name__ == "__main__":
     setup(
         name="magicdict",
-        version=_load_version.load("magicdict"),
+        use_scm_version={"local_scheme": lambda v: ""},
         author="Kaede Hoshikawa",
         author_email="futursolo@icloud.com",
+        python_requires=">=3.6.0",
         url="https://gitlab.com/futursolo/magicdict",
         license="Apache License 2.0",
         description="An ordered, one-to-many mapping.",

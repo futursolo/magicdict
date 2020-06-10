@@ -1,6 +1,7 @@
 stages:
   - testing
   - packaging
+  - release
 
 before_script:
   - export CURRENT_COMMIT_NO=$(git rev-list --count $CI_COMMIT_SHA)
@@ -35,3 +36,25 @@ packaging-3-6-linux:
   artifacts:
     paths:
       - dist/
+
+pypi-3-6-linux:
+  image: python:3.6
+  stage: release
+  variables:
+    TWINE_USERNAME: __token__
+    TWINE_PASSWORD: $TESTPYPI_TOKEN
+  script:
+    - twine upload --repository-url https://test.pypi.org/legacy/ dist/*
+  except:
+    - tags
+
+testpypi-3-6-linux:
+  image: python:3.6
+  stage: release
+  variables:
+    TWINE_USERNAME: __token__
+    TWINE_PASSWORD: $TESTPYPI_TOKEN
+  script:
+    - twine upload dist/*
+  only:
+    - tags

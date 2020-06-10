@@ -1,2 +1,4 @@
 setuptools>=38.4.0
 pytest-runner>=5.2,<6
+setuptools-scm>=3.5.0
+importlib_metadata>=1.6.1
