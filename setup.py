@@ -22,7 +22,6 @@ import sys
 if not sys.version_info[:3] >= (3, 6, 0):
     raise RuntimeError("Magicdict requires Python 3.6.0 or higher.")
 
-
 setup_requires = [
     i for i in open("setup-requirements.txt").read().split("\n") if i]
 
