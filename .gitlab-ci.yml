@@ -4,8 +4,6 @@ stages:
   - release
 
 before_script:
-  - export CURRENT_COMMIT_NO=$(git rev-list --count $CI_COMMIT_SHA)
-
   - pip install -U pip wheel
 
   - pip install -U -r setup-requirements.txt
@@ -37,17 +35,6 @@ packaging-3-6-linux:
     paths:
       - dist/
 
-pypi-3-6-linux:
-  image: python:3.6
-  stage: release
-  variables:
-    TWINE_USERNAME: __token__
-    TWINE_PASSWORD: $TESTPYPI_TOKEN
-  script:
-    - twine upload --repository-url https://test.pypi.org/legacy/ dist/*
-  except:
-    - tags
-
 testpypi-3-6-linux:
   image: python:3.6
   stage: release
@@ -55,6 +42,19 @@ testpypi-3-6-linux:
     TWINE_USERNAME: __token__
     TWINE_PASSWORD: $TESTPYPI_TOKEN
   script:
+    - pip install -U twine
+    - twine upload --repository-url https://test.pypi.org/legacy/ dist/*
+  except:
+    - tags
+
+pypi-3-6-linux:
+  image: python:3.6
+  stage: release
+  variables:
+    TWINE_USERNAME: __token__
+    TWINE_PASSWORD: $PYPI_TOKEN
+  script:
+    - pip install -U twine
     - twine upload dist/*
   only:
     - tags
