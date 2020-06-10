@@ -16,7 +16,7 @@
 #   limitations under the License.
 
 from typing import Reversible, ItemsView, TypeVar, Generic, Tuple, \
-    Any, Set, Iterable, Iterator, Union, AbstractSet
+    Any, Set, Iterable, Iterator, Union
 
 import typing
 import collections
@@ -40,17 +40,19 @@ class MagicItemsView(
     def __init__(self, __map: "FrozenMagicDict[_K, _V]") -> None:
         self._map = __map
 
-        super().__init__(self._map)  # type: ignore
+        super().__init__(self._map)
 
     def _alter_keys_reduced(self, obj: Iterable[_T]) -> Set[Tuple[_K, Any]]:
         reduced_set: Set[Tuple[_K, Any]] = set()
 
         for i in obj:
             try:
+                k: _K
+                v: Any
                 k, v = i  # type: ignore
                 k = self._map._alter_key(k)
 
-            except (AttributeError, TypeError):  # pragma: no cover
+            except (AttributeError, TypeError, ValueError):  # pragma: no cover
                 continue
 
             reduced_set.add((k, v))
@@ -62,10 +64,13 @@ class MagicItemsView(
 
         for i in obj:
             try:
+                k: _K
+                v: Any
                 k, v = i  # type: ignore
                 k = self._map._maybe_alter_key(k)
 
-            except (AttributeError, IndexError):  # pragma: no cover
+            except (AttributeError, IndexError, TypeError,
+                    ValueError):  # pragma: no cover
                 reduced_set.add(i)
 
             else:
@@ -126,19 +131,19 @@ class MagicItemsView(
     def __ge__(self, obj: Iterable[Any]) -> bool:
         return super().__ge__(self._maybe_alter_keys(obj))
 
-    def __and__(self, obj: Iterable[Any]) -> AbstractSet[Tuple[_K, _V]]:
+    def __and__(self, obj: Iterable[Any]) -> Set[Tuple[_K, _V]]:
         return super().__and__(self._alter_keys_reduced(obj))
 
     def __or__(
-            self, obj: Iterable[_T]) -> AbstractSet[Union[Tuple[_K, _V], _T]]:
+            self, obj: Iterable[_T]) -> Set[Union[Tuple[_K, _V], _T]]:
         return super().__or__(self._maybe_alter_keys(obj))
 
-    def __sub__(self, obj: Iterable[Any]) -> AbstractSet[Tuple[_K, _V]]:
+    def __sub__(self, obj: Iterable[Any]) -> Set[Tuple[_K, _V]]:
         return super().__sub__(self._alter_keys_reduced(obj))
 
     def __xor__(
-            self, obj: Iterable[_T]) -> AbstractSet[Union[Tuple[_K, _V], _T]]:
+            self, obj: Iterable[_T]) -> Set[Union[Tuple[_K, _V], _T]]:
         return super().__xor__(self._maybe_alter_keys(obj))
 
     def __reversed__(self) -> Iterator[Tuple[_K, _V]]:
-        yield from reversed(self._map._kv_pairs.values())  # type: ignore
+        yield from reversed(self._map._kv_pairs.values())

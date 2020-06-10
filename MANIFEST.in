@@ -8,3 +8,4 @@ global-exclude *.pyo
 global-exclude *.pyc
 exclude ./_modify_version.py
 include *requirements.txt
+recursive-include . py.typed

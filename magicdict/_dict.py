@@ -15,12 +15,14 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from typing import MutableMapping, Generic, TypeVar, Any, Union, Tuple
+from typing import MutableMapping, Generic, TypeVar, Any, Union, Tuple, \
+    Optional, Iterable, Iterator
 
 from ._frozen_dict import FrozenMagicDict
 
 import threading
 import collections
+import typing
 
 __all__ = ["MagicDict"]
 
@@ -99,8 +101,8 @@ class MagicDict(
         self._add_one(key, value)
 
     def pop(
-        self, key: _K, default: Union[_V, _T, _Identifier]=_DEFAULT_MARK
-            ) -> Union[_V, _T]:
+        self, key: _K, default: Union[_V, _T, _Identifier] = _DEFAULT_MARK
+    ) -> Union[_V, _T]:
         key = self._alter_key(key)
 
         try:
@@ -129,7 +131,7 @@ class MagicDict(
             else:
                 return default  # type: ignore
 
-    def popitem(self, last: bool=True) -> Tuple[_K, _V]:
+    def popitem(self, last: bool = True) -> Tuple[_K, _V]:
         with self._lock:
             index, pair = self._kv_pairs.popitem(last)
 
@@ -159,8 +161,8 @@ class MagicDict(
                      "got {} args.").format(len(args)))
 
             elif isinstance(args[0], collections.abc.Mapping):
-                    for k, v in args[0].items():
-                        self.add(k, v)
+                for k, v in args[0].items():
+                    self.add(k, v)
 
             elif isinstance(args[0], collections.abc.Iterable):
                 for k, v in args[0]:
@@ -184,10 +186,45 @@ class MagicDict(
 
             self._last_values.clear()
 
-    def setdefault(self, key: _K, default: _V=None) -> _V:
+    @typing.overload  # type: ignore
+    def setdefault(
+            self: "MagicDict[_K, None]", key: _K, default: None) -> None:
+        ...
+
+    @typing.overload
+    def setdefault(self, key: _K, default: _V) -> _V:
+        ...
+
+    def setdefault(
+            self, key: _K, default: Optional[_V] = None) -> Optional[_V]:
         try:
             return self[key]
 
         except KeyError:
             self[key] = default  # type: ignore
-            return default  # type: ignore
+
+            return default
+
+    def copy(self) -> "MagicDict[_K, _V]":
+        return self.__class__(self)
+
+    @classmethod
+    @typing.overload
+    def fromkeys(Cls, keys: Iterable[_K]) -> "MagicDict[_K, None]":
+        ...
+
+    @classmethod
+    @typing.overload
+    def fromkeys(Cls, keys: Iterable[_K],
+                 value: _V) -> "MagicDict[_K, _V]":
+        ...
+
+    @classmethod
+    def fromkeys(  # type: ignore
+        Cls, keys: Iterable[_K], value: Optional[_V] = None) -> \
+            Union["MagicDict[_K, None]", "MagicDict[_K, _V]"]:
+        def _gen() -> Iterator[Tuple[_K, Optional[_V]]]:
+            for k in keys:
+                yield (k, value)
+
+        return Cls(_gen())

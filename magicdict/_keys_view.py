@@ -17,7 +17,7 @@
 
 from typing import \
     Iterator, KeysView, Generic, Union, Iterable, Set, Any, Reversible, \
-    TypeVar, AbstractSet
+    TypeVar
 
 import typing
 import collections
@@ -38,7 +38,7 @@ class MagicKeysView(KeysView[_K], Reversible[_K], Generic[_K]):
     def __init__(self, __map: "FrozenMagicDict[_K, Any]") -> None:
         self._map = __map
 
-        super().__init__(self._map)  # type: ignore
+        super().__init__(self._map)
 
     def _alter_keys_reduced(self, obj: Iterable[_T]) -> Set[_T]:
         reduced_set: Set[_T] = set()
@@ -111,18 +111,18 @@ class MagicKeysView(KeysView[_K], Reversible[_K], Generic[_K]):
     def __ge__(self, obj: Iterable[Any]) -> bool:
         return super().__ge__(self._maybe_alter_keys(obj))
 
-    def __and__(self, obj: Iterable[Any]) -> AbstractSet[_K]:
+    def __and__(self, obj: Iterable[Any]) -> Set[_K]:
         return super().__and__(self._alter_keys_reduced(obj))
 
-    def __or__(self, obj: Iterable[_T]) -> AbstractSet[Union[_K, _T]]:
+    def __or__(self, obj: Iterable[_T]) -> Set[Union[_K, _T]]:
         return super().__or__(self._maybe_alter_keys(obj))
 
-    def __sub__(self, obj: Iterable[Any]) -> AbstractSet[_K]:
+    def __sub__(self, obj: Iterable[Any]) -> Set[_K]:
         return super().__sub__(self._alter_keys_reduced(obj))
 
-    def __xor__(self, obj: Iterable[_T]) -> AbstractSet[Union[_K, _T]]:
+    def __xor__(self, obj: Iterable[_T]) -> Set[Union[_K, _T]]:
         return super().__xor__(self._maybe_alter_keys(obj))
 
     def __reversed__(self) -> Iterator[_K]:
-        for key, _ in reversed(self._map._kv_pairs.values()):  # type: ignore
+        for key, _ in reversed(self._map._kv_pairs.values()):
             yield key

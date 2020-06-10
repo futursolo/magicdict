@@ -35,7 +35,7 @@ class MagicValuesView(ValuesView[_V], Generic[_V]):
     def __init__(self, __map: "FrozenMagicDict[Any, _V]") -> None:
         self._map = __map
 
-        super().__init__(self._map)  # type: ignore
+        super().__init__(self._map)
 
     def __iter__(self) -> Iterator[_V]:
         for _, value in self._map._kv_pairs.values():
@@ -45,5 +45,5 @@ class MagicValuesView(ValuesView[_V], Generic[_V]):
         return self._map._has_value(value)
 
     def __reversed__(self) -> Iterator[_V]:
-        for _, value in reversed(self._map._kv_pairs.values()):  # type: ignore
+        for _, value in reversed(self._map._kv_pairs.values()):
             yield value

@@ -19,7 +19,7 @@ testing-3-6-linux:
   stage: testing
 
   script:
-    - mypy --python-version 3.6 --disallow-untyped-calls --disallow-untyped-defs --warn-unused-ignores --show-traceback --strict-optional --ignore-missing-imports --show-error-context magicdict
+    - mypy --python-version 3.6 --strict --show-traceback --ignore-missing-imports --show-error-context --implicit-reexport --pretty -p magicdict
     - flake8 .
     - python -m coverage run --source=magicdict setup.py test
 
