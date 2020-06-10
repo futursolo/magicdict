@@ -56,6 +56,7 @@ if __name__ == "__main__":
         description="An ordered, one-to-many mapping.",
         long_description=open("README.rst", "r").read(),
         packages=find_packages(),
+        package_data={"": ["*"]},
         include_package_data=True,
         setup_requires=setup_requires,
         install_requires=install_requires,
