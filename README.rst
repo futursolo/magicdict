@@ -3,7 +3,7 @@ magicdict
 .. image:: https://codecov.io/gl/futursolo/magicdict/branch/master/graph/badge.svg
   :target: https://codecov.io/gl/futursolo/magicdict
 
-.. image:: https://gitlab.com/futursolo/magicdict/badges/master/build.svg
+.. image:: https://gitlab.com/futursolo/magicdict/badges/master/pipeline.svg
   :target: https://gitlab.com/futursolo/magicdict/commits/master
 
 An ordered, one-to-many mapping.
