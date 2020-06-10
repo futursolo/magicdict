@@ -165,6 +165,14 @@ class FrozenMagicDict(Reversible[_K], Mapping[_K, _V], Generic[_K, _V]):
         for key, _ in reversed(self._kv_pairs.values()):
             yield key
 
+    @typing.overload
+    def get_first(self, key: _K) -> Optional[_V]:
+        ...
+
+    @typing.overload
+    def get_first(self, key: _K, default: _T = ...) -> Union[_V, _T]:
+        ...
+
     def get_first(self, key: _K, default: Optional[_T] = None) -> \
             Optional[Union[_V, _T]]:
         """
@@ -180,7 +188,27 @@ class FrozenMagicDict(Reversible[_K], Mapping[_K, _V], Generic[_K, _V]):
         except KeyError:
             return default
 
-    def get_last(self, key: _K, default: Optional[_V] = None) -> \
+    @typing.overload
+    def get(self, key: _K) -> Optional[_V]:
+        ...
+
+    @typing.overload
+    def get(self, key: _K, default: _T = ...) -> Union[_V, _T]:
+        ...
+
+    def get(self, key: _K, default: Optional[_T] = None) -> \
+            Optional[Union[_V, _T]]:
+        return self.get(key, default)
+
+    @typing.overload
+    def get_last(self, key: _K) -> Optional[_V]:
+        ...
+
+    @typing.overload
+    def get_last(self, key: _K, default: _T = ...) -> Union[_V, _T]:
+        ...
+
+    def get_last(self, key: _K, default: Optional[_T] = None) -> \
             Optional[Union[_V, _T]]:
         """
         Return the last value for key if key is in the dictionary,
@@ -249,5 +277,4 @@ class FrozenMagicDict(Reversible[_K], Mapping[_K, _V], Generic[_K, _V]):
 
         return Cls(_gen())  # type: ignore
 
-    get = get_first  # type: ignore
     __repr__ = __str__
