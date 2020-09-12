@@ -39,7 +39,7 @@ if __name__ == "__main__":
         author="Kaede Hoshikawa",
         author_email="futursolo@icloud.com",
         python_requires=">=3.6.0",
-        url="https://gitlab.com/futursolo/magicdict",
+        url="https://github.com/futursolo/magicdict",
         license="Apache License 2.0",
         description="An ordered, one-to-many mapping.",
         long_description=open("README.rst", "r").read(),

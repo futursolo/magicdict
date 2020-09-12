@@ -1,10 +1,13 @@
 magicdict
 =========
-.. image:: https://codecov.io/gl/futursolo/magicdict/branch/master/graph/badge.svg
-  :target: https://codecov.io/gl/futursolo/magicdict
+.. image:: https://coveralls.io/repos/github/futursolo/magicdict/badge.svg
+  :target: https://coveralls.io/github/futursolo/magicdict
 
-.. image:: https://gitlab.com/futursolo/magicdict/badges/master/pipeline.svg
-  :target: https://gitlab.com/futursolo/magicdict/commits/master
+.. image:: https://github.com/futursolo/magicdict/workflows/Testing/badge.svg?branch=master&event=push
+  :target: https://github.com/futursolo/magicdict/actions
+
+.. image:: https://img.shields.io/pypi/v/magicdict.svg
+    :target: https://pypi.org/project/magicdict/
 
 An ordered, one-to-many mapping.
 
@@ -46,7 +49,7 @@ dictionary without removing the existing one. Setting values like normal
 
 Contributing
 ------------
-The repository is hosted on `GitLab <https://gitlab.com/futursolo/magicdict>`_.
+The repository is hosted on `GitHub <https://github.com/futursolo/magicdict>`_.
 
 License
 -------
