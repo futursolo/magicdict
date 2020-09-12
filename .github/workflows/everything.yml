@@ -88,7 +88,7 @@ jobs:
         run: python setup.py sdist bdist_wheel
 
       - name: Publish to PyPI
-        uses: pypa/gh-action-pypi-publish@v1
+        uses: pypa/gh-action-pypi-publish@v1.3.1
         with:
           user: __token__
           password: ${{ secrets.PYPI_TOKEN }}
@@ -120,7 +120,7 @@ jobs:
         run: python setup.py sdist bdist_wheel
 
       - name: Publish to Test PyPI
-        uses: pypa/gh-action-pypi-publish@v1
+        uses: pypa/gh-action-pypi-publish@v1.3.1
         with:
           user: __token__
           password: ${{ secrets.TEST_PYPI_TOKEN }}
