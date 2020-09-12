@@ -3,7 +3,7 @@ magicdict
 .. image:: https://coveralls.io/repos/github/futursolo/magicdict/badge.svg
   :target: https://coveralls.io/github/futursolo/magicdict
 
-.. image:: https://github.com/futursolo/magicdict/workflows/Testing/badge.svg?branch=master&event=push
+.. image:: https://github.com/futursolo/magicdict/workflows/testing%20%26%20packaging/badge.svg?branch=master&event=push
   :target: https://github.com/futursolo/magicdict/actions
 
 .. image:: https://img.shields.io/pypi/v/magicdict.svg
