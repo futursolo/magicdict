@@ -39,7 +39,13 @@ from . import _frozen_tolerant_dict
 from . import _dict
 from . import _tolerant_dict
 
-__all__ = _version.__all__ + _keys_view.__all__ + _values_view.__all__ + \
-    _items_view.__all__ + _frozen_dict.__all__ + \
-    _frozen_tolerant_dict.__all__ + _dict.__all__ + \
-    _tolerant_dict.__all__
+__all__ = (
+    _version.__all__
+    + _keys_view.__all__
+    + _values_view.__all__
+    + _items_view.__all__
+    + _frozen_dict.__all__
+    + _frozen_tolerant_dict.__all__
+    + _dict.__all__
+    + _tolerant_dict.__all__
+)

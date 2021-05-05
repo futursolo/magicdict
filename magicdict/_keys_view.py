@@ -15,12 +15,21 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from typing import \
-    Iterator, KeysView, Generic, Union, Iterable, Set, Any, Reversible, \
-    TypeVar
+from typing import (
+    Iterator,
+    KeysView,
+    Generic,
+    Union,
+    Iterable,
+    Set,
+    Any,
+    Reversible,
+    TypeVar,
+)
 
 import typing
 import collections
+import collections.abc
 
 if typing.TYPE_CHECKING:  # pragma: no cover
     from ._frozen_dict import FrozenMagicDict  # noqa: F401

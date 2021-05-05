@@ -15,13 +15,23 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from typing import MutableMapping, Generic, TypeVar, Any, Union, Tuple, \
-    Optional, Iterable, Iterator
+from typing import (
+    MutableMapping,
+    Generic,
+    TypeVar,
+    Any,
+    Union,
+    Tuple,
+    Optional,
+    Iterable,
+    Iterator,
+)
 
 from ._frozen_dict import FrozenMagicDict
 
 import threading
 import collections
+import collections.abc
 import typing
 
 __all__ = ["MagicDict"]
@@ -41,10 +51,12 @@ _DEFAULT_MARK = _Identifier()
 
 
 class MagicDict(
-        FrozenMagicDict[_K, _V], MutableMapping[_K, _V], Generic[_K, _V]):
+    FrozenMagicDict[_K, _V], MutableMapping[_K, _V], Generic[_K, _V]
+):
     """
     A mutable version of `FrozenMagicDict`.
     """
+
     __slots__ = ("_lock",)
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
@@ -72,8 +84,9 @@ class MagicDict(
 
             self._first_values[key] = value
 
-            previous_indexes, self._pair_ids[key] = \
-                self._pair_ids.get(key, []), [index]
+            previous_indexes, self._pair_ids[key] = self._pair_ids.get(
+                key, []
+            ), [index]
 
             for index in previous_indexes:
                 del self._kv_pairs[index]
@@ -157,8 +170,11 @@ class MagicDict(
         if args:
             if len(args) > 1:  # pragma: no cover
                 raise TypeError(
-                    ("update expected at most 1 positional argument, "
-                     "got {} args.").format(len(args)))
+                    (
+                        "update expected at most 1 positional argument, "
+                        "got {} args."
+                    ).format(len(args))
+                )
 
             elif isinstance(args[0], collections.abc.Mapping):
                 for k, v in args[0].items():
@@ -170,9 +186,11 @@ class MagicDict(
 
             else:  # pragma: no cover
                 raise TypeError(
-                    ("update expected a Mapping or an Iterable "
-                     "as the positional argument, got {}.")
-                    .format(type(args[0])))
+                    (
+                        "update expected a Mapping or an Iterable "
+                        "as the positional argument, got {}."
+                    ).format(type(args[0]))
+                )
 
         for k, v in kwargs.items():
             self.add(k, v)
@@ -188,7 +206,8 @@ class MagicDict(
 
     @typing.overload  # type: ignore
     def setdefault(
-            self: "MagicDict[_K, None]", key: _K, default: None) -> None:
+        self: "MagicDict[_K, None]", key: _K, default: None
+    ) -> None:
         ...
 
     @typing.overload
@@ -196,7 +215,8 @@ class MagicDict(
         ...
 
     def setdefault(
-            self, key: _K, default: Optional[_V] = None) -> Optional[_V]:
+        self, key: _K, default: Optional[_V] = None
+    ) -> Optional[_V]:
         try:
             return self[key]
 
@@ -215,14 +235,13 @@ class MagicDict(
 
     @classmethod
     @typing.overload
-    def fromkeys(Cls, keys: Iterable[_K],
-                 value: _V) -> "MagicDict[_K, _V]":
+    def fromkeys(Cls, keys: Iterable[_K], value: _V) -> "MagicDict[_K, _V]":
         ...
 
     @classmethod
     def fromkeys(  # type: ignore
-        Cls, keys: Iterable[_K], value: Optional[_V] = None) -> \
-            Union["MagicDict[_K, None]", "MagicDict[_K, _V]"]:
+        Cls, keys: Iterable[_K], value: Optional[_V] = None
+    ) -> Union["MagicDict[_K, None]", "MagicDict[_K, _V]"]:
         def _gen() -> Iterator[Tuple[_K, Optional[_V]]]:
             for k in keys:
                 yield (k, value)

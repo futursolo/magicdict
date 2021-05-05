@@ -15,14 +15,27 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from typing import Reversible, Mapping, Generic, TypeVar, Any, Dict, List, \
-    Optional, Tuple, Iterator, Iterable, Union
+from typing import (
+    Reversible,
+    Mapping,
+    Generic,
+    TypeVar,
+    Any,
+    Dict,
+    List,
+    Optional,
+    Tuple,
+    Iterator,
+    Iterable,
+    Union,
+)
 
 from ._keys_view import MagicKeysView
 from ._values_view import MagicValuesView
 from ._items_view import MagicItemsView
 
 import collections
+import collections.abc
 import typing
 
 __all__ = ["FrozenMagicDict"]
@@ -38,9 +51,14 @@ class FrozenMagicDict(Reversible[_K], Mapping[_K, _V], Generic[_K, _V]):
     """
     An immutable ordered, one-to-many Mapping.
     """
+
     __slots__ = (
-        "_next_index", "_first_values", "_pair_ids", "_kv_pairs",
-        "_last_values")
+        "_next_index",
+        "_first_values",
+        "_pair_ids",
+        "_kv_pairs",
+        "_last_values",
+    )
 
     @staticmethod
     def _alter_key(key: _K) -> _K:
@@ -56,14 +74,14 @@ class FrozenMagicDict(Reversible[_K], Mapping[_K, _V], Generic[_K, _V]):
 
     @typing.overload  # noqa: F811
     def __init__(
-        self, __map: Mapping[_K, _V],
-            **kwargs: _V) -> None:  # pragma: no cover
+        self, __map: Mapping[_K, _V], **kwargs: _V
+    ) -> None:  # pragma: no cover
         ...
 
     @typing.overload  # noqa: F811
     def __init__(
-        self, __iterable: Iterable[Tuple[_K, _V]],
-            **kwargs: _V) -> None:  # pragma: no cover
+        self, __iterable: Iterable[Tuple[_K, _V]], **kwargs: _V
+    ) -> None:  # pragma: no cover
         ...
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:  # noqa: F811
@@ -72,17 +90,20 @@ class FrozenMagicDict(Reversible[_K], Mapping[_K, _V], Generic[_K, _V]):
         self._first_values: Dict[_K, _V] = {}
 
         self._pair_ids: Dict[_K, List[int]] = {}
-        self._kv_pairs: \
-            "collections.OrderedDict[int, Tuple[_K, _V]]" = \
+        self._kv_pairs: "collections.OrderedDict[int, Tuple[_K, _V]]" = (
             collections.OrderedDict()
+        )
 
         self._last_values: Dict[_K, _V] = {}
 
         if args:
             if len(args) > 1:  # pragma: no cover
                 raise TypeError(
-                    ("update expected at most 1 positional argument, "
-                     "got {} args.").format(len(args)))
+                    (
+                        "update expected at most 1 positional argument, "
+                        "got {} args."
+                    ).format(len(args))
+                )
 
             if isinstance(args[0], collections.abc.Mapping):
                 for k, v in args[0].items():
@@ -94,9 +115,11 @@ class FrozenMagicDict(Reversible[_K], Mapping[_K, _V], Generic[_K, _V]):
 
             else:  # pragma: no cover
                 raise TypeError(
-                    ("update expected a Mapping or an Iterable "
-                     "as the positional argument, got {}.")
-                    .format(type(args[0])))
+                    (
+                        "update expected a Mapping or an Iterable "
+                        "as the positional argument, got {}."
+                    ).format(type(args[0]))
+                )
 
         for k, v in kwargs.items():
             self._add_one(k, v)
@@ -159,7 +182,8 @@ class FrozenMagicDict(Reversible[_K], Mapping[_K, _V], Generic[_K, _V]):
     def __str__(self) -> str:
         return "{}({})".format(
             self.__class__.__name__,
-            repr([(key, value) for (key, value) in self._kv_pairs.values()]))
+            repr([(key, value) for (key, value) in self._kv_pairs.values()]),
+        )
 
     def __reversed__(self) -> Iterator[_K]:
         for key, _ in reversed(self._kv_pairs.values()):
@@ -173,8 +197,9 @@ class FrozenMagicDict(Reversible[_K], Mapping[_K, _V], Generic[_K, _V]):
     def get_first(self, key: _K, default: _T = ...) -> Union[_V, _T]:
         ...
 
-    def get_first(self, key: _K, default: Optional[_T] = None) -> \
-            Optional[Union[_V, _T]]:
+    def get_first(
+        self, key: _K, default: Optional[_T] = None
+    ) -> Optional[Union[_V, _T]]:
         """
         Return the first value for key if key is in the dictionary,
         else default. If default is not given, it defaults to `None`,
@@ -196,8 +221,9 @@ class FrozenMagicDict(Reversible[_K], Mapping[_K, _V], Generic[_K, _V]):
     def get(self, key: _K, default: _T = ...) -> Union[_V, _T]:
         ...
 
-    def get(self, key: _K, default: Optional[_T] = None) -> \
-            Optional[Union[_V, _T]]:
+    def get(
+        self, key: _K, default: Optional[_T] = None
+    ) -> Optional[Union[_V, _T]]:
         return self.get_first(key, default)
 
     @typing.overload
@@ -208,8 +234,9 @@ class FrozenMagicDict(Reversible[_K], Mapping[_K, _V], Generic[_K, _V]):
     def get_last(self, key: _K, default: _T = ...) -> Union[_V, _T]:
         ...
 
-    def get_last(self, key: _K, default: Optional[_T] = None) -> \
-            Optional[Union[_V, _T]]:
+    def get_last(
+        self, key: _K, default: Optional[_T] = None
+    ) -> Optional[Union[_V, _T]]:
         """
         Return the last value for key if key is in the dictionary,
         else default. If default is not given, it defaults to `None`,
@@ -263,14 +290,15 @@ class FrozenMagicDict(Reversible[_K], Mapping[_K, _V], Generic[_K, _V]):
 
     @classmethod
     @typing.overload
-    def fromkeys(Cls, keys: Iterable[_K],
-                 value: _V) -> "FrozenMagicDict[_K, _V]":
+    def fromkeys(
+        Cls, keys: Iterable[_K], value: _V
+    ) -> "FrozenMagicDict[_K, _V]":
         ...
 
     @classmethod
     def fromkeys(
-        Cls, keys: Iterable[_K], value: Optional[_V] = None) -> \
-            Union["FrozenMagicDict[_K, None]", "FrozenMagicDict[_K, _V]"]:
+        Cls, keys: Iterable[_K], value: Optional[_V] = None
+    ) -> Union["FrozenMagicDict[_K, None]", "FrozenMagicDict[_K, _V]"]:
         def _gen() -> Iterator[Tuple[_K, Optional[_V]]]:
             for k in keys:
                 yield (k, value)

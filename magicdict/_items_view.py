@@ -15,11 +15,22 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from typing import Reversible, ItemsView, TypeVar, Generic, Tuple, \
-    Any, Set, Iterable, Iterator, Union
+from typing import (
+    Reversible,
+    ItemsView,
+    TypeVar,
+    Generic,
+    Tuple,
+    Any,
+    Set,
+    Iterable,
+    Iterator,
+    Union,
+)
 
 import typing
 import collections
+import collections.abc
 
 if typing.TYPE_CHECKING:  # pragma: no cover
     from ._frozen_dict import FrozenMagicDict  # noqa: F401
@@ -34,7 +45,8 @@ _T = TypeVar("_T")
 
 
 class MagicItemsView(
-        Reversible[Tuple[_K, _V]], ItemsView[_K, _V], Generic[_K, _V]):
+    Reversible[Tuple[_K, _V]], ItemsView[_K, _V], Generic[_K, _V]
+):
     __slots__ = ("_map",)
 
     def __init__(self, __map: "FrozenMagicDict[_K, _V]") -> None:
@@ -69,8 +81,12 @@ class MagicItemsView(
                 k, v = i  # type: ignore
                 k = self._map._maybe_alter_key(k)
 
-            except (AttributeError, IndexError, TypeError,
-                    ValueError):  # pragma: no cover
+            except (
+                AttributeError,
+                IndexError,
+                TypeError,
+                ValueError,
+            ):  # pragma: no cover
                 reduced_set.add(i)
 
             else:
@@ -134,15 +150,13 @@ class MagicItemsView(
     def __and__(self, obj: Iterable[Any]) -> Set[Tuple[_K, _V]]:
         return super().__and__(self._alter_keys_reduced(obj))
 
-    def __or__(
-            self, obj: Iterable[_T]) -> Set[Union[Tuple[_K, _V], _T]]:
+    def __or__(self, obj: Iterable[_T]) -> Set[Union[Tuple[_K, _V], _T]]:
         return super().__or__(self._maybe_alter_keys(obj))
 
     def __sub__(self, obj: Iterable[Any]) -> Set[Tuple[_K, _V]]:
         return super().__sub__(self._alter_keys_reduced(obj))
 
-    def __xor__(
-            self, obj: Iterable[_T]) -> Set[Union[Tuple[_K, _V], _T]]:
+    def __xor__(self, obj: Iterable[_T]) -> Set[Union[Tuple[_K, _V], _T]]:
         return super().__xor__(self._maybe_alter_keys(obj))
 
     def __reversed__(self) -> Iterator[Tuple[_K, _V]]:
