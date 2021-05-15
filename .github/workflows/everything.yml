@@ -30,7 +30,7 @@ jobs:
 
       - name: Mypy
         run: |
-          poetry run mypy -p hiyori
+          poetry run mypy -p magicdict
 
       - name: Lint with flake8
         run: |
