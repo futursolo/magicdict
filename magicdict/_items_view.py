@@ -16,21 +16,20 @@
 #   limitations under the License.
 
 from typing import (
-    Reversible,
-    ItemsView,
-    TypeVar,
-    Generic,
-    Tuple,
     Any,
-    Set,
+    Generic,
+    ItemsView,
     Iterable,
     Iterator,
+    Reversible,
+    Set,
+    Tuple,
+    TypeVar,
     Union,
 )
-
-import typing
 import collections
 import collections.abc
+import typing
 
 if typing.TYPE_CHECKING:  # pragma: no cover
     from ._frozen_dict import FrozenMagicDict  # noqa: F401

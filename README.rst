@@ -28,7 +28,7 @@ Usage
 -----
 :code:`MagicDict` should function like :code:`collections.OrderedDict` except
 :code:`move_to_end` is not defined and :code:`d[key]` always returns the first
-item.
+matched item.
 
 :code:`FrozenMagicDict` is an immutable version of :code:`MagicDict`.
 
@@ -53,7 +53,7 @@ The repository is hosted on `GitHub <https://github.com/futursolo/magicdict>`_.
 
 License
 -------
-Copyright 2020 Kaede Hoshikawa
+Copyright 2021 Kaede Hoshikawa
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

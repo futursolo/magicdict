@@ -15,9 +15,9 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from magicdict import TolerantMagicDict
-
 import pytest
+
+from magicdict import TolerantMagicDict
 
 
 class TolerantMagicDictTestCase:
@@ -42,16 +42,16 @@ class TolerantMagicDictTestCase:
     def test_method_delitem(self):
         dic = TolerantMagicDict([("a", "b"), ("a", "c")])
 
-        "b" in dic.values()
-        "c" in dic.values()
+        assert "b" in dic.values()
+        assert "c" in dic.values()
 
         del dic["A"]
 
         with pytest.raises(KeyError):
             dic["a"]
 
-        "b" not in dic.values()
-        "c" not in dic.values()
+        assert "b" not in dic.values()
+        assert "c" not in dic.values()
 
     def test_get_last(self):
         dic = TolerantMagicDict([("a", "b"), ("a", "d"), ("a", "f")])

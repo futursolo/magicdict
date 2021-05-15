@@ -35,7 +35,7 @@ class MagicKeysViewTestCase:
         sample = [("a", "b"), ("c", "d"), ("c", "d"), ("e", "f")]
         dic = FrozenMagicDict(sample)
 
-        assert "a" in dic.keys()
+        assert "a" in dic.keys()  # noqa: SIM118
         assert "d" not in dic.keys()
         assert 123 not in dic.keys()
 
@@ -55,8 +55,9 @@ class MagicKeysViewTestCase:
         sample = [("a", "b"), ("c", "d"), ("c", "d"), ("e", "f")]
         dic = FrozenMagicDict(sample)
 
-        assert list(reversed(dic.keys())) == \
-            list(reversed([k for k, _ in sample]))
+        assert list(reversed(dic.keys())) == list(
+            reversed([k for k, _ in sample])
+        )
 
     def test_method_lt(self):
         sample = [("a", "b"), ("c", "d")]
@@ -136,10 +137,10 @@ class TolerantMagicKeysViewTestCase:
         sample = [("A", "b"), ("c", "d"), ("c", "d"), ("e", "f")]
         dic = FrozenTolerantMagicDict(sample)
 
-        assert "a" in dic.keys()
-        assert "A" in dic.keys()
-        assert "d" not in dic.keys()
-        assert 123 not in dic.keys()
+        assert "a" in dic.keys()  # noqa: SIM118
+        assert "A" in dic.keys()  # noqa: SIM118
+        assert "d" not in dic.keys()  # noqa: SIM118
+        assert 123 not in dic.keys()  # noqa: SIM118
 
     def test_method_eq_ne(self):
         sample = [("A", "b"), ("c", "d"), ("c", "d"), ("e", "f")]
@@ -153,8 +154,9 @@ class TolerantMagicKeysViewTestCase:
         sample = [("A", "b"), ("c", "d"), ("C", "d"), ("e", "f")]
         dic = FrozenTolerantMagicDict(sample)
 
-        assert list(reversed(dic.keys())) == \
-            list(reversed([k.lower() for k, _ in sample]))
+        assert list(reversed(dic.keys())) == list(
+            reversed([k.lower() for k, _ in sample])
+        )
 
     def test_method_lt(self):
         sample = [("a", "b"), ("c", "d")]

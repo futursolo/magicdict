@@ -16,20 +16,20 @@
 #   limitations under the License.
 
 from typing import (
+    Any,
+    Generic,
+    Iterable,
     Iterator,
     KeysView,
-    Generic,
-    Union,
-    Iterable,
-    Set,
-    Any,
     Reversible,
+    Set,
     TypeVar,
+    Union,
 )
-
-import typing
 import collections
 import collections.abc
+import contextlib
+import typing
 
 if typing.TYPE_CHECKING:  # pragma: no cover
     from ._frozen_dict import FrozenMagicDict  # noqa: F401
@@ -67,18 +67,15 @@ class MagicKeysView(KeysView[_K], Reversible[_K], Generic[_K]):
         reduced_set: Set[_T] = set()
 
         for i in obj:
-            try:
+            with contextlib.suppress(AttributeError, TypeError):
                 i = self._map._maybe_alter_key(i)
-
-            except (AttributeError, TypeError):  # pragma: no cover
-                pass
 
             reduced_set.add(i)
 
         return reduced_set
 
     def __contains__(self, key: Any) -> bool:
-        return self._map._maybe_alter_key(key) in self._map._pair_ids.keys()
+        return self._map._maybe_alter_key(key) in self._map._pair_ids
 
     def __eq__(self, obj: Any) -> bool:
         if not isinstance(obj, collections.abc.Iterable):  # pragma: no cover

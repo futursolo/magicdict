@@ -15,12 +15,20 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from typing import TypeVar, Generic, AnyStr, Any, Iterable, Optional, \
-    Iterator, Union, Tuple
+from typing import (
+    Any,
+    AnyStr,
+    Generic,
+    Iterable,
+    Iterator,
+    Optional,
+    Tuple,
+    TypeVar,
+    Union,
+)
+import typing
 
 from ._frozen_dict import FrozenMagicDict
-
-import typing
 
 _V = TypeVar("_V")
 
@@ -28,11 +36,13 @@ __all__ = ["FrozenTolerantMagicDict"]
 
 
 class FrozenTolerantMagicDict(
-        FrozenMagicDict[AnyStr, _V], Generic[AnyStr, _V]):
+    FrozenMagicDict[AnyStr, _V], Generic[AnyStr, _V]
+):
     """
     `FrozenTolerantMagicDict` has exactly the same functionality as
     `FrozenMagicDict`. However, the keys are case-insensitive.
     """
+
     __slots__ = ()
 
     @staticmethod
@@ -51,23 +61,27 @@ class FrozenTolerantMagicDict(
 
     @classmethod
     @typing.overload
-    def fromkeys(Cls, keys: Iterable[AnyStr]) -> \
-            "FrozenTolerantMagicDict[AnyStr, None]":
+    def fromkeys(
+        cls, keys: Iterable[AnyStr]
+    ) -> "FrozenTolerantMagicDict[AnyStr, None]":
         ...
 
     @classmethod
     @typing.overload
-    def fromkeys(Cls, keys: Iterable[AnyStr],
-                 value: _V) -> "FrozenTolerantMagicDict[AnyStr, _V]":
+    def fromkeys(
+        cls, keys: Iterable[AnyStr], value: _V
+    ) -> "FrozenTolerantMagicDict[AnyStr, _V]":
         ...
 
     @classmethod
     def fromkeys(  # type: ignore
-        Cls, keys: Iterable[AnyStr], value: Optional[_V] = None) -> \
-            Union["FrozenTolerantMagicDict[AnyStr, None]",
-                  "FrozenTolerantMagicDict[AnyStr, _V]"]:
+        cls, keys: Iterable[AnyStr], value: Optional[_V] = None
+    ) -> Union[
+        "FrozenTolerantMagicDict[AnyStr, None]",
+        "FrozenTolerantMagicDict[AnyStr, _V]",
+    ]:
         def _gen() -> Iterator[Tuple[AnyStr, Optional[_V]]]:
             for k in keys:
                 yield (k, value)
 
-        return Cls(_gen())  # type: ignore
+        return cls(_gen())  # type: ignore

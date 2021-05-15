@@ -15,6 +15,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
+
 from magicdict import FrozenMagicDict, FrozenTolerantMagicDict
 
 
@@ -107,7 +108,8 @@ class MagicItemsViewTestCase:
         dic2 = FrozenMagicDict(sample2)
 
         assert dic.items() | dic2.items() == set(
-            [("a", "b"), ("c", "d"), ("e", "f")])
+            [("a", "b"), ("c", "d"), ("e", "f")]
+        )
 
     def test_method_sub(self):
         sample = [("a", "b"), ("c", "d"), ("e", "f")]
@@ -148,8 +150,9 @@ class TolerantMagicItemsViewTestCase:
         sample = [("a", "b"), ("C", "d"), ("c", "d"), ("E", "f")]
         dic = FrozenTolerantMagicDict(sample)
 
-        assert list(reversed(dic.items())) == \
-            list(reversed([(k.lower(), v) for k, v in sample]))
+        assert list(reversed(dic.items())) == list(
+            reversed([(k.lower(), v) for k, v in sample])
+        )
 
     def test_method_lt(self):
         sample = [("a", "b"), ("C", "d")]
@@ -204,7 +207,8 @@ class TolerantMagicItemsViewTestCase:
         dic2 = FrozenTolerantMagicDict(sample2)
 
         assert dic.items() | dic2.items() == set(
-            [("a", "b"), ("c", "d"), ("e", "f")])
+            [("a", "b"), ("c", "d"), ("e", "f")]
+        )
 
     def test_method_sub(self):
         sample = [("a", "b"), ("c", "d"), ("e", "f")]

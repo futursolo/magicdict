@@ -42,5 +42,6 @@ class MagicValuesViewTestCase:
         sample = [("a", "b"), ("c", "d"), ("c", "d"), ("e", "f")]
         dic = FrozenMagicDict(sample)
 
-        assert list(reversed(dic.values())) == \
-            list(reversed([v for _, v in sample]))
+        assert list(reversed(dic.values())) == list(
+            reversed([v for _, v in sample])
+        )

@@ -16,27 +16,26 @@
 #   limitations under the License.
 
 from typing import (
-    Reversible,
-    Mapping,
-    Generic,
-    TypeVar,
     Any,
     Dict,
-    List,
-    Optional,
-    Tuple,
-    Iterator,
+    Generic,
     Iterable,
+    Iterator,
+    List,
+    Mapping,
+    Optional,
+    Reversible,
+    Tuple,
+    TypeVar,
     Union,
 )
-
-from ._keys_view import MagicKeysView
-from ._values_view import MagicValuesView
-from ._items_view import MagicItemsView
-
 import collections
 import collections.abc
 import typing
+
+from ._items_view import MagicItemsView
+from ._keys_view import MagicKeysView
+from ._values_view import MagicValuesView
 
 __all__ = ["FrozenMagicDict"]
 
@@ -109,7 +108,7 @@ class FrozenMagicDict(Reversible[_K], Mapping[_K, _V], Generic[_K, _V]):
                 for k, v in args[0].items():
                     self._add_one(k, v)
 
-            elif isinstance(args[0], collections.abc.Iterable):
+            elif isinstance(args[0], collections.abc.Iterable):  # noqa: SIM106
                 for k, v in args[0]:
                     self._add_one(k, v)
 
@@ -146,12 +145,7 @@ class FrozenMagicDict(Reversible[_K], Mapping[_K, _V], Generic[_K, _V]):
         self._last_values[key] = value
 
     def _has_value(self, value: Any) -> bool:
-        for _, _value in self._kv_pairs.values():
-            if _value == value:
-                return True
-
-        else:
-            return False
+        return any(_value == value for _, _value in self._kv_pairs.values())
 
     def __getitem__(self, key: _K) -> _V:
         key = self._alter_key(key)
@@ -285,24 +279,24 @@ class FrozenMagicDict(Reversible[_K], Mapping[_K, _V], Generic[_K, _V]):
 
     @classmethod
     @typing.overload
-    def fromkeys(Cls, keys: Iterable[_K]) -> "FrozenMagicDict[_K, None]":
+    def fromkeys(cls, keys: Iterable[_K]) -> "FrozenMagicDict[_K, None]":
         ...
 
     @classmethod
     @typing.overload
     def fromkeys(
-        Cls, keys: Iterable[_K], value: _V
+        cls, keys: Iterable[_K], value: _V
     ) -> "FrozenMagicDict[_K, _V]":
         ...
 
     @classmethod
     def fromkeys(
-        Cls, keys: Iterable[_K], value: Optional[_V] = None
+        cls, keys: Iterable[_K], value: Optional[_V] = None
     ) -> Union["FrozenMagicDict[_K, None]", "FrozenMagicDict[_K, _V]"]:
         def _gen() -> Iterator[Tuple[_K, Optional[_V]]]:
             for k in keys:
                 yield (k, value)
 
-        return Cls(_gen())  # type: ignore
+        return cls(_gen())  # type: ignore
 
     __repr__ = __str__

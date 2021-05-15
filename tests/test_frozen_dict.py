@@ -46,7 +46,7 @@ class FrozenMagicDictTestCase:
         sample = [("a", "b"), ("c", "d"), ("c", "d"), ("e", "f")]
         dic = FrozenMagicDict(sample)
 
-        list(iter(dic)) == ["a", "c", "c", "e"]
+        assert list(iter(dic)) == ["a", "c", "c", "e"]
 
     def test_method_len(self):
         sample = [("a", "b"), ("c", "d"), ("c", "d"), ("e", "f")]
@@ -63,7 +63,8 @@ class FrozenMagicDictTestCase:
 
     def test_method_eq_ne(self):
         sample_dic = FrozenMagicDict(
-            [("a", "b"), ("c", "d"), ("c", "d"), ("e", "f")])
+            [("a", "b"), ("c", "d"), ("c", "d"), ("e", "f")]
+        )
         dic = FrozenMagicDict(sample_dic)
 
         assert dic == sample_dic
@@ -80,7 +81,8 @@ class FrozenMagicDictTestCase:
 
     def test_method_reversed(self):
         sample = FrozenMagicDict(
-            [("a", "b"), ("c", "d"), ("c", "d"), ("e", "f")])
+            [("a", "b"), ("c", "d"), ("c", "d"), ("e", "f")]
+        )
         dic = FrozenMagicDict(sample)
 
         assert list(reversed(dic)) == list(reversed(sample))

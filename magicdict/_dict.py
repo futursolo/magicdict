@@ -16,23 +16,22 @@
 #   limitations under the License.
 
 from typing import (
-    MutableMapping,
-    Generic,
-    TypeVar,
     Any,
-    Union,
-    Tuple,
-    Optional,
+    Generic,
     Iterable,
     Iterator,
+    MutableMapping,
+    Optional,
+    Tuple,
+    TypeVar,
+    Union,
 )
-
-from ._frozen_dict import FrozenMagicDict
-
-import threading
 import collections
 import collections.abc
+import threading
 import typing
+
+from ._frozen_dict import FrozenMagicDict
 
 __all__ = ["MagicDict"]
 
@@ -84,11 +83,12 @@ class MagicDict(
 
             self._first_values[key] = value
 
-            previous_indexes, self._pair_ids[key] = self._pair_ids.get(
-                key, []
-            ), [index]
+            previous_indexes, self._pair_ids[key] = (
+                self._pair_ids.get(key, []),
+                [index],
+            )
 
-            for index in previous_indexes:
+            for index in previous_indexes:  # type: ignore
                 del self._kv_pairs[index]
 
             self._kv_pairs[index] = (key, value)
@@ -180,7 +180,7 @@ class MagicDict(
                 for k, v in args[0].items():
                     self.add(k, v)
 
-            elif isinstance(args[0], collections.abc.Iterable):
+            elif isinstance(args[0], collections.abc.Iterable):  # noqa: SIM106
                 for k, v in args[0]:
                     self.add(k, v)
 
@@ -230,20 +230,20 @@ class MagicDict(
 
     @classmethod
     @typing.overload
-    def fromkeys(Cls, keys: Iterable[_K]) -> "MagicDict[_K, None]":
+    def fromkeys(cls, keys: Iterable[_K]) -> "MagicDict[_K, None]":
         ...
 
     @classmethod
     @typing.overload
-    def fromkeys(Cls, keys: Iterable[_K], value: _V) -> "MagicDict[_K, _V]":
+    def fromkeys(cls, keys: Iterable[_K], value: _V) -> "MagicDict[_K, _V]":
         ...
 
     @classmethod
     def fromkeys(  # type: ignore
-        Cls, keys: Iterable[_K], value: Optional[_V] = None
+        cls, keys: Iterable[_K], value: Optional[_V] = None
     ) -> Union["MagicDict[_K, None]", "MagicDict[_K, _V]"]:
         def _gen() -> Iterator[Tuple[_K, Optional[_V]]]:
             for k in keys:
                 yield (k, value)
 
-        return Cls(_gen())
+        return cls(_gen())

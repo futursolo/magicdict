@@ -29,8 +29,9 @@ class FrozenTolerantMagicDictTestCase:
         sample = {"A": "b", "c": "d", "e": "f"}
         dic = FrozenTolerantMagicDict(sample)
 
-        assert list(dic.items()) == \
-            list({"a": "b", "c": "d", "e": "f"}.items())
+        assert list(dic.items()) == list(
+            {"a": "b", "c": "d", "e": "f"}.items()
+        )
 
     def test_init_with_kwargs(self):
         sample = {"a": "b", "c": "d", "e": "f"}

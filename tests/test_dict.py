@@ -15,9 +15,9 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from magicdict import MagicDict
-
 import pytest
+
+from magicdict import MagicDict
 
 
 class MagicDictTestCase:
