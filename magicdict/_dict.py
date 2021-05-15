@@ -89,8 +89,6 @@ class MagicDict(
                 [index],
             )
 
-            previous_indexes = typing.cast(List[int], previous_indexes)
-
             for index in previous_indexes:
                 del self._kv_pairs[index]
 
