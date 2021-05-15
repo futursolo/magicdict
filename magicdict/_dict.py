@@ -20,7 +20,6 @@ from typing import (
     Generic,
     Iterable,
     Iterator,
-    List,
     MutableMapping,
     Optional,
     Tuple,
