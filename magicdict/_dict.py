@@ -20,6 +20,7 @@ from typing import (
     Generic,
     Iterable,
     Iterator,
+    List,
     MutableMapping,
     Optional,
     Tuple,
@@ -88,7 +89,9 @@ class MagicDict(
                 [index],
             )
 
-            for index in previous_indexes:  # type: ignore
+            previous_indexes = typing.cast(List[int], previous_indexes)
+
+            for index in previous_indexes:
                 del self._kv_pairs[index]
 
             self._kv_pairs[index] = (key, value)
